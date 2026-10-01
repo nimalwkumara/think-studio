@@ -174,6 +174,19 @@ def init_db():
         'https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec'
     ))
 
+    # Always ensure Google OAuth Client ID setting exists
+    c.execute('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', ('googleClientId', ''))
+
+    # Schema migration: Add avatar and google_id columns to users if missing
+    try:
+        c.execute('ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ""')
+    except Exception:
+        pass
+    try:
+        c.execute('ALTER TABLE users ADD COLUMN google_id TEXT DEFAULT ""')
+    except Exception:
+        pass
+
     conn.commit()
     conn.close()
 
@@ -246,13 +259,15 @@ def get_full_state():
     raw_users = c.fetchall()
     users = []
     for u in raw_users:
+        u_dict = dict(u)
         user_dict = {
             "id": u["id"],
             "name": u["name"],
             "email": u["email"],
             "phone": u["phone"],
             "role": u["role"],
-            "org": u["org"]
+            "org": u["org"],
+            "avatar": u_dict.get("avatar") or ""
         }
         if u["role"] == "customer":
             user_dict["package"] = {
@@ -329,6 +344,11 @@ def get_full_state():
     gsw_row = c.fetchone()
     google_sheet_webhook = gsw_row["value"] if gsw_row else "https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec"
 
+    # Google OAuth Settings
+    c.execute('SELECT value FROM settings WHERE key = "googleClientId"')
+    gci_row = c.fetchone()
+    google_client_id = gci_row["value"] if gci_row else ""
+
     conn.close()
     return {
         "users": users,
@@ -338,6 +358,7 @@ def get_full_state():
         "allPayments": all_payments,
         "studioBank": studio_bank,
         "googleSheetWebhook": google_sheet_webhook,
+        "googleClientId": google_client_id,
         "databaseType": "SQLite3 (Persistent Database)",
         "dbPath": DB_PATH
     }
@@ -709,6 +730,114 @@ class ThinkStudioHandler(http.server.SimpleHTTPRequestHandler):
             conn.commit()
             conn.close()
             self.send_json({"success": True, "message": f"Slip {slip_id} rejected"})
+            return
+
+        # 15. Google OAuth Sign-In & Upsert (SQLite + Google Sheets Sync)
+        elif parsed.path == '/api/users/google-auth':
+            email = payload.get('email', '').strip().lower()
+            name = payload.get('name', '').strip() or 'Google User'
+            avatar = payload.get('avatar', '').strip()
+            google_id = payload.get('googleId', '').strip()
+
+            if not email:
+                conn.close()
+                self.send_json({"success": False, "error": "Email is required"}, 400)
+                return
+
+            c.execute('SELECT * FROM users WHERE LOWER(email) = ?', (email,))
+            existing = c.fetchone()
+
+            if existing:
+                u_row = dict(existing)
+                # Update avatar & google_id if supplied
+                if avatar:
+                    try:
+                        c.execute('UPDATE users SET avatar = ?, google_id = COALESCE(NULLIF(google_id, ""), ?) WHERE LOWER(email) = ?', (avatar, google_id, email))
+                        conn.commit()
+                        u_row['avatar'] = avatar
+                    except Exception:
+                        pass
+
+                user_dict = {
+                    "id": u_row["id"],
+                    "name": u_row["name"],
+                    "email": u_row["email"],
+                    "phone": u_row["phone"],
+                    "role": u_row["role"],
+                    "org": u_row["org"],
+                    "avatar": u_row.get("avatar") or avatar
+                }
+                if u_row["role"] == "customer":
+                    user_dict["package"] = {
+                        "name": u_row["package_name"],
+                        "cost": u_row["package_cost"],
+                        "totalHours": u_row["total_hours"],
+                        "usedHours": u_row["used_hours"],
+                        "remainingHours": u_row["remaining_hours"],
+                        "startDate": u_row["start_date"],
+                        "endDate": u_row["end_date"]
+                    }
+                    c.execute('SELECT * FROM payments WHERE LOWER(user_email) = ? AND status = "Verified" ORDER BY date DESC', (email,))
+                    user_dict["payments"] = [dict(p) for p in c.fetchall()]
+                    user_dict["balanceDue"] = u_row["balance_due"]
+
+                conn.close()
+                self.send_json({"success": True, "user": user_dict, "isNew": False, "message": f"Welcome back, {user_dict['name']}"})
+                return
+            else:
+                role = "admin" if email in ['thinkstudiocontact@gmail.com', 'admin@thinkstudio.com'] else "customer"
+                u_id = f"u-{int(time.time() * 1000)}"
+                phone = payload.get('phone', '+94 70 000 0000')
+
+                from datetime import datetime, timedelta
+                now_d = datetime.now()
+                end_d = now_d + timedelta(days=30)
+                start_str = now_d.strftime("%Y-%m-%d")
+                end_str = end_d.strftime("%Y-%m-%d")
+
+                c.execute('''
+                    INSERT INTO users (id, name, email, phone, role, org, package_name, package_cost, total_hours, used_hours, remaining_hours, start_date, end_date, balance_due, avatar, google_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    u_id, name, email, phone, role, 'Google Sign-In',
+                    'Monthly Package', 12000, 20, 0, 20,
+                    start_str, end_str, 12000, avatar, google_id
+                ))
+                conn.commit()
+
+                new_user = {
+                    "id": u_id,
+                    "name": name,
+                    "email": email,
+                    "phone": phone,
+                    "role": role,
+                    "org": "Google Sign-In",
+                    "avatar": avatar,
+                    "package": {
+                        "name": "Monthly Package",
+                        "cost": 12000,
+                        "totalHours": 20,
+                        "usedHours": 0,
+                        "remainingHours": 20,
+                        "startDate": start_str,
+                        "endDate": end_str
+                    },
+                    "payments": [],
+                    "balanceDue": 12000
+                }
+
+                sync_user_to_google_sheet(new_user, event_type="google_signup")
+                conn.close()
+                self.send_json({"success": True, "user": new_user, "isNew": True, "message": f"Google account created for {name}"})
+                return
+
+        # 16. Save Google Client ID Settings
+        elif parsed.path == '/api/settings/google-auth':
+            client_id = payload.get('googleClientId', '').strip()
+            c.execute('INSERT OR REPLACE INTO settings (key, value) VALUES ("googleClientId", ?)', (client_id,))
+            conn.commit()
+            conn.close()
+            self.send_json({"success": True, "googleClientId": client_id, "message": "Google Client ID saved in SQLite database"})
             return
 
         conn.close()

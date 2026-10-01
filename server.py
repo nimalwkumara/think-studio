@@ -280,8 +280,18 @@ def init_db():
         'https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec'
     ))
 
-    # Google OAuth Client ID Settings
-    c.execute('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', ('googleClientId', ''))
+    # Google OAuth Settings (Loaded safely from Environment Variables or SQLite Database)
+    env_client_id = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+    env_client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '').strip()
+    if env_client_id:
+        c.execute('INSERT OR REPLACE INTO settings (key, value) VALUES ("googleClientId", ?)', (env_client_id,))
+    else:
+        c.execute('INSERT OR IGNORE INTO settings (key, value) VALUES ("googleClientId", "")')
+
+    if env_client_secret:
+        c.execute('INSERT OR REPLACE INTO settings (key, value) VALUES ("googleClientSecret", ?)', (env_client_secret,))
+    else:
+        c.execute('INSERT OR IGNORE INTO settings (key, value) VALUES ("googleClientSecret", "")')
 
     conn.commit()
     conn.close()

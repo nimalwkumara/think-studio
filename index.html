@@ -1793,7 +1793,7 @@
         { id: "SLIP-901", userEmail: "dr.rajesh@gmail.com", userName: "Dr. Rajesh Sharma", amount: 4000, ref: "CB-8942188", date: "2026-09-28", status: "Pending Verification" }
       ],
       googleSheetWebhook: "https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec",
-      googleClientId: ""
+      googleClientId: "32116406733-jpak27r6jpr2s827bl6g77hh0jtrjqqf.apps.googleusercontent.com"
     };
 
     function loadState() {
@@ -1823,7 +1823,7 @@
         data.bookings[0].passcode = "THINK2026";
       }
       data.googleSheetWebhook = data.googleSheetWebhook || "https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec";
-      data.googleClientId = data.googleClientId || "";
+      data.googleClientId = "32116406733-jpak27r6jpr2s827bl6g77hh0jtrjqqf.apps.googleusercontent.com";
       localStorage.setItem('THINK_STUDIO_STATE', JSON.stringify(data));
       return data;
     }
@@ -2155,7 +2155,7 @@
       setupGsi();
 
       function setupGsi() {
-        const clientId = state.googleClientId;
+        const clientId = state.googleClientId || "32116406733-jpak27r6jpr2s827bl6g77hh0jtrjqqf.apps.googleusercontent.com";
         const badge = document.getElementById('googleAuthStatusBadge');
         const badgeText = document.getElementById('googleAuthStatusText');
 
@@ -2177,19 +2177,25 @@
           if (badgeText) badgeText.textContent = "OFFICIAL GSI ACTIVE";
 
           const target = document.getElementById('gsiButtonTarget');
+          const customBtn = document.getElementById('btnGoogleSignIn');
           if (target) {
             target.innerHTML = '';
             target.classList.remove('hidden');
+            if (customBtn) customBtn.classList.add('hidden');
             window.google.accounts.id.renderButton(target, {
-              theme: 'filled_black',
+              theme: 'outline',
               size: 'large',
-              shape: 'pill',
-              width: 320,
-              text: 'signin_with'
+              shape: 'rectangular',
+              width: 380,
+              text: 'continue_with',
+              logo_alignment: 'left'
             });
           }
+          try { window.google.accounts.id.prompt(); } catch(e){}
         } catch (e) {
           console.warn("Google Identity Services initialization notice:", e);
+          const customBtn = document.getElementById('btnGoogleSignIn');
+          if (customBtn) customBtn.classList.remove('hidden');
         }
       }
     }
@@ -2224,6 +2230,11 @@
     }
 
     function triggerGoogleSignIn() {
+      const gBtn = document.querySelector('#gsiButtonTarget div[role="button"]') || document.querySelector('#gsiButtonTarget iframe');
+      if (gBtn) {
+        gBtn.click();
+        return;
+      }
       if (window.google && window.google.accounts && window.google.accounts.id && state.googleClientId) {
         try {
           window.google.accounts.id.prompt((notification) => {

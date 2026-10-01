@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+.system_generated/
+.DS_Store
+*.log
+index_before_*.html
+server_before_*.py
+*.tmp

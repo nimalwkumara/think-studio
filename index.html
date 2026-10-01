@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Think Studio | Premium Studio Management Portal</title>
+  <meta name="description" content="Professional Online Teaching & Content Creation Studio. Customer Portal, Zoom Teaching Links, Package Tracking, Payments & Booking Management.">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #F7E7B4;
+      --gold-dark: #996515;
+      --gold-glow: rgba(212,175,55,0.25);
+      --bg: #07080D;
+      --card: #0E1018;
+      --card2: #131620;
+      --border: rgba(255,255,255,0.07);
+      --border-gold: rgba(212,175,55,0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: #E2E8F0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- GOLD GRADIENT ---- */
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #FFF5CC 0%, #F0D060 30%, #D4AF37 65%, #AA7C11 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gold-gradient-bg {
+      background: linear-gradient(135deg, #ECC875 0%, #D4AF37 50%, #996515 100%);
+    }
+
+    /* ---- GLASS CARDS ---- */
+    .glass {
+      background: rgba(14,16,24,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+    }
+    .glass-gold {
+      background: rgba(14,16,24,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 0 40px rgba(212,175,55,0.06), inset 0 1px 0 rgba(212,175,55,0.12);
+    }
+
+    /* ---- 3D RAISED CARDS ---- */
+    .card-3d {
+      background: linear-gradient(145deg, #141720 0%, #0E1018 60%, #0A0C12 100%);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.04) inset,
+        0 -1px 0 rgba(0,0,0,0.6) inset,
+        0 4px 24px rgba(0,0,0,0.5),
+        0 1px 0 rgba(0,0,0,0.8);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card-3d:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.06) inset,
+        0 -1px 0 rgba(0,0,0,0.6) inset,
+        0 12px 40px rgba(0,0,0,0.6),
+        0 2px 0 rgba(0,0,0,0.8);
+    }
+    .card-gold-3d {
+      background: linear-gradient(145deg, #161820 0%, #0E1018 60%, #0A0C12 100%);
+      border: 1px solid rgba(212,175,55,0.25);
+      box-shadow:
+        0 1px 0 rgba(212,175,55,0.12) inset,
+        0 -1px 0 rgba(0,0,0,0.6) inset,
+        0 4px 24px rgba(0,0,0,0.5),
+        0 0 30px rgba(212,175,55,0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card-gold-3d:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 1px 0 rgba(212,175,55,0.18) inset,
+        0 0 60px rgba(212,175,55,0.12),
+        0 16px 48px rgba(0,0,0,0.6);
+    }
+
+    /* ---- GLOW BORDERS ---- */
+    .glow-gold { box-shadow: 0 0 20px rgba(212,175,55,0.2), 0 0 60px rgba(212,175,55,0.08); }
+    .glow-emerald { box-shadow: 0 0 20px rgba(16,185,129,0.2); }
+    .glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+
+    /* ---- GRID TEXTURE ---- */
+    .dot-grid {
+      background-image: radial-gradient(rgba(212,175,55,0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .line-grid {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ---- ANIMATIONS ---- */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-record {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.85); }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-12px) rotate(1deg); }
+    }
+    @keyframes orb-drift {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(40px,-30px) scale(1.05); }
+      66% { transform: translate(-20px,20px) scale(0.97); }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes borderGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.15); }
+      50% { box-shadow: 0 0 40px rgba(212,175,55,0.35); }
+    }
+    @keyframes progressFill {
+      from { width: 0%; }
+    }
+
+    .fade-in { animation: fadeSlideUp 0.3s ease-out forwards; }
+    .recording-dot { animation: pulse-record 1.8s infinite ease-in-out; }
+    .shimmer-effect::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: skewX(-20deg);
+      animation: shimmer 4s infinite ease-in-out;
+    }
+    .float-anim { animation: float 5s ease-in-out infinite; }
+    .orb { animation: orb-drift 12s ease-in-out infinite; }
+    .spin-slow { animation: spin-slow 20s linear infinite; }
+    .anim-border { animation: borderGlow 3s ease-in-out infinite; }
+    .progress-animate { animation: progressFill 1.2s ease-out forwards; }
+
+    /* ---- HOVER TILT ---- */
+    .tilt-card { transition: transform 0.3s ease; }
+    .tilt-card:hover { transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-4px); }
+
+    /* ---- INPUTS ---- */
+    .input-dark {
+      background: rgba(4,5,10,0.8);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #f1f5f9;
+      border-radius: 12px;
+      padding: 10px 14px;
+      width: 100%;
+      outline: none;
+      font-size: 13px;
+      transition: border-color 0.2s;
+    }
+    .input-dark:focus { border-color: rgba(212,175,55,0.5); box-shadow: 0 0 0 3px rgba(212,175,55,0.08); }
+
+    /* ---- BADGES ---- */
+    .badge-gold { background: rgba(212,175,55,0.12); color: #D4AF37; border: 1px solid rgba(212,175,55,0.3); border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+    .badge-green { background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.3); border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+    .badge-amber { background: rgba(251,191,36,0.12); color: #FBBF24; border: 1px solid rgba(251,191,36,0.3); border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+    .badge-blue { background: rgba(59,130,246,0.12); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+    .badge-red { background: rgba(239,68,68,0.12); color: #F87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+
+    /* ---- TABLE ---- */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table thead th { padding: 12px 14px; background: rgba(0,0,0,0.4); color: #64748B; text-transform: uppercase; font-family: monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-align: left; }
+    .data-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+    .data-table tbody tr:hover { background: rgba(212,175,55,0.03); }
+    .data-table tbody td { padding: 12px 14px; vertical-align: middle; color: #CBD5E1; }
+
+    /* ---- SCROLLBAR ---- */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 2px; }
+
+    /* ---- SIDEBAR ---- */
+    #adminSidebar { transition: transform 0.3s ease; }
+    @media (max-width: 1023px) {
+      #adminSidebar { transform: translateX(-100%); position: fixed; z-index: 50; }
+      #adminSidebar.open { transform: translateX(0); }
+    }
+
+    /* ---- PROGRESS RING ---- */
+    .progress-ring__circle { transition: stroke-dashoffset 1.2s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }
+
+    /* ---- SECTION DIVIDER ---- */
+    .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 0; }
+
+    /* ---- AMBIENT ORBS ---- */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="bg-[#07080D] text-slate-100 selection:bg-[#D4AF37]/30 selection:text-white">
+
+  <!-- Ambient background orbs -->
+  <div class="ambient-orb w-[500px] h-[500px] bg-[#D4AF37]/8 top-0 left-1/4 orb"></div>
+  <div class="ambient-orb w-[400px] h-[400px] bg-blue-600/6 top-1/3 right-0" style="animation: orb-drift 16s ease-in-out infinite reverse;"></div>
+  <div class="ambient-orb w-[350px] h-[350px] bg-[#D4AF37]/5 bottom-0 left-0" style="animation: orb-drift 20s ease-in-out infinite;"></div>
+
+  <!-- Toast -->
+  <div id="dbToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] hidden px-5 py-3 rounded-2xl glass-gold text-white text-xs font-semibold shadow-2xl flex items-center gap-2.5 transition-all"></div>
+
+  <!-- ==================== TOP SYSTEM ROLE BAR ==================== -->
+  <div class="hidden bg-[#07080D]/95 border-b border-white/5 px-4 py-1.5 text-[11px] font-mono flex flex-wrap items-center justify-between gap-2 text-slate-400 z-50 relative backdrop-blur-xl">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+        <span class="text-slate-500">ROLE:</span>
+        <span class="text-white font-bold tracking-wide" id="currentRoleBadge">Guest Mode</span>
+      </div>
+      <div id="dbStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[10px]">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>SQLite3 Connected</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="quickLogin('customer')" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/8 text-slate-300 hover:text-white transition-all text-[11px]">
+         Customer Demo
+      </button>
+      <button onclick="quickLogin('admin')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#D4AF37] transition-all text-[11px] font-bold">
+        <svg class="w-3.5 h-3.5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>Admin Demo</span>
+      </button>
+      <button onclick="handleLogout()" id="topLogoutBtn" class="hidden px-3 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all text-[11px]">
+        Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="sticky top-0 z-40 backdrop-blur-2xl bg-[#07080D]/80 border-b border-white/6 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[68px] flex items-center justify-between">
+
+      <a href="javascript:void(0)" onclick="navigateTo('public')" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A1D2A] to-[#0D0F16] border border-[#D4AF37]/35 flex items-center justify-center shadow-lg group-hover:border-[#D4AF37]/70 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300">
+          <svg class="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke="#D4AF37" stroke-opacity="0.7"/>
+            <circle cx="12" cy="12" r="4" fill="#D4AF37"/>
+            <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#D4AF37" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full recording-dot border-2 border-[#07080D]"></span>
+        </div>
+        <div>
+          <span class="text-[18px] font-black tracking-widest text-white uppercase">THINK <span class="text-[#D4AF37]">STUDIO</span></span>
+          <span class="text-[9px] uppercase tracking-[0.2em] text-slate-500 block -mt-0.5 font-mono">Portal & Studio System</span>
+        </div>
+      </a>
+
+      <nav id="publicNavLinks" class="hidden md:flex items-center gap-6 lg:gap-8 text-[13px] font-medium text-slate-400">
+        <a href="javascript:void(0)" onclick="navigateTo('public','services')" class="hover:text-[#D4AF37] transition-colors relative group">Services<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+        <a href="javascript:void(0)" onclick="navigateTo('public','facilities')" class="hover:text-[#D4AF37] transition-colors relative group">Facilities<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+        <a href="javascript:void(0)" onclick="navigateTo('public','packages')" class="hover:text-[#D4AF37] transition-colors relative group">Packages<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+        <a href="javascript:void(0)" onclick="navigateTo('public','reviews')" class="hover:text-[#D4AF37] transition-colors relative group">Reviews<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+        <a href="javascript:void(0)" onclick="navigateTo('public','bank')" class="hover:text-[#D4AF37] transition-colors relative group">Bank<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+        <a href="javascript:void(0)" onclick="navigateTo('public','contact')" class="hover:text-[#D4AF37] transition-colors relative group">Contact<span class="absolute -bottom-0.5 left-0 w-0 h-px bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span></a>
+      </nav>
+
+      <div class="hidden sm:flex items-center gap-3">
+        <div id="guestAuthGroup" class="flex items-center gap-2">
+          <button onclick="openAuthModal('login')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/20 transition-all">Login</button>
+          <button onclick="openAuthModal('register')" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-black gold-gradient-bg shadow-md hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all relative overflow-hidden shimmer-effect">Register</button>
+        </div>
+        <div id="userAuthGroup" class="hidden flex items-center gap-3">
+          <button onclick="navigateToDashboard()" id="navDashboardBtn" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl card-3d text-xs font-medium text-white hover:border-[#D4AF37]/40 transition-all">
+            <span class="w-6 h-6 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-xs" id="navUserAvatar">R</span>
+            <span id="navUserName">User</span>
+            <span class="badge-gold text-[10px] px-2 py-0.5" id="navRoleTag">Portal</span>
+          </button>
+          <button onclick="handleLogout()" class="text-xs text-slate-500 hover:text-red-400 font-mono py-1 px-2 transition-colors">Logout</button>
+        </div>
+        <button onclick="handleHeaderBookClick()" class="relative overflow-hidden px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase text-black gold-gradient-bg shadow-md hover:shadow-[0_0_24px_rgba(212,175,55,0.4)] transition-all active:scale-95 shimmer-effect">
+          Book Now
+        </button>
+      </div>
+
+      <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-white p-2 rounded-xl bg-white/5 border border-white/8 active:scale-95 transition-transform">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-[#0A0C14]/98 border-t border-white/5 px-5 py-5 space-y-3 backdrop-blur-xl">
+      <a href="javascript:void(0)" onclick="navigateTo('public','services'); toggleMobileMenu();" class="block text-sm text-slate-300 hover:text-[#D4AF37] transition-colors py-1.5 font-medium">Services</a>
+      <a href="javascript:void(0)" onclick="navigateTo('public','facilities'); toggleMobileMenu();" class="block text-sm text-slate-300 hover:text-[#D4AF37] transition-colors py-1.5 font-medium">Facilities</a>
+      <a href="javascript:void(0)" onclick="navigateTo('public','packages'); toggleMobileMenu();" class="block text-sm text-slate-300 hover:text-[#D4AF37] transition-colors py-1.5 font-medium">Packages</a>
+      <a href="javascript:void(0)" onclick="navigateTo('public','reviews'); toggleMobileMenu();" class="block text-sm text-slate-300 hover:text-[#D4AF37] transition-colors py-1.5 font-medium">Reviews</a>
+      <a href="javascript:void(0)" onclick="navigateTo('public','bank'); toggleMobileMenu();" class="block text-sm text-slate-300 hover:text-[#D4AF37] transition-colors py-1.5 font-medium">Bank Details</a>
+      <div class="pt-3 border-t border-white/5 grid grid-cols-2 gap-2">
+        <button onclick="openAuthModal('login'); toggleMobileMenu();" class="py-2.5 rounded-xl text-xs font-semibold text-slate-200 bg-white/5 border border-white/8">Login</button>
+        <button onclick="handleHeaderBookClick(); toggleMobileMenu();" class="py-2.5 rounded-xl text-xs font-bold uppercase text-black gold-gradient-bg">Book Now</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTAINER ==================== -->
+  <main id="appContainer">
+
+    <!-- ==================== VIEW 1: PUBLIC HOMEPAGE ==================== -->
+    <div id="viewPublic" class="space-y-0">
+
+      <!-- HERO -->
+      <section class="relative pt-14 pb-24 md:pt-20 md:pb-32 overflow-hidden dot-grid" id="services">
+        <!-- Hero background depth -->
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[720px] bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+          <div class="absolute top-28 -right-32 w-[380px] h-[380px] bg-blue-500/10 rounded-full blur-3xl"></div>
+          <div class="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-3xl"></div>
+          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-[1.03fr_0.97fr] gap-12 lg:gap-10 items-center">
+
+            <!-- Left: Brand message -->
+            <div class="text-center lg:text-left">
+              <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-gold text-[11px] font-medium text-slate-300 mb-7 shadow-2xl">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                </span>
+                <span class="font-mono tracking-wide uppercase">Premium teaching • recording • creator studio</span>
+                <span class="hidden sm:inline text-[#D4AF37] text-xs ml-1">Sri Lanka</span>
+              </div>
+
+              <h1 class="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-white leading-[0.92] mb-6">
+                Create.<br>
+                Teach.<br>
+                <span class="gold-gradient-text">Record.</span>
+                <span class="block text-slate-200">Grow.</span>
+              </h1>
+
+              <p class="text-sm sm:text-base md:text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-9">
+                Think Studio gives educators and creators a professional space for online classes, Zoom sessions, smart board lessons, video recording, package tracking, bookings, and verified payment management.
+              </p>
+
+              <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
+                <button onclick="handleHeaderBookClick()" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-black tracking-wider uppercase text-black gold-gradient-bg shadow-xl hover:shadow-[0_0_42px_rgba(212,175,55,0.45)] transition-all flex items-center justify-center gap-3 relative overflow-hidden shimmer-effect active:scale-95">
+                  <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  Book a Session
+                </button>
+                <button onclick="quickLogin('customer')" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-bold text-slate-200 card-3d hover:border-[#D4AF37]/35 transition-all flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8M12 17v4"/></svg>
+                  View Client Portal
+                </button>
+              </div>
+
+              <!-- Trust stats -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto lg:mx-0">
+                <div class="card-3d p-4 rounded-2xl text-center">
+                  <div class="text-[#D4AF37] font-mono font-black text-base">1</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">Camera</div>
+                </div>
+                <div class="card-3d p-4 rounded-2xl text-center">
+                  <div class="text-[#D4AF37] font-mono font-black text-base">Smart</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">Board</div>
+                </div>
+                <div class="card-3d p-4 rounded-2xl text-center">
+                  <div class="text-[#D4AF37] font-mono font-black text-base">Zoom</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">Ready</div>
+                </div>
+                <div class="card-3d p-4 rounded-2xl text-center">
+                  <div class="text-[#D4AF37] font-mono font-black text-base">AC</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">Studio</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Soft 3D SaaS / studio preview -->
+            <div class="relative flex items-center justify-center lg:justify-end">
+              <div class="absolute w-[360px] h-[360px] bg-[#D4AF37]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div class="relative w-full max-w-[520px] float-anim">
+                <!-- Main 3D shell -->
+                <div class="relative card-gold-3d rounded-[2rem] p-4 sm:p-5 anim-border overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/6 via-transparent to-[#D4AF37]/8 pointer-events-none"></div>
+
+                  <!-- Studio screen header -->
+                  <div class="relative flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                      <div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
+                      <div class="w-3 h-3 rounded-full bg-emerald-400/80"></div>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 border border-white/8">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span class="text-[10px] font-mono text-emerald-300">LIVE PORTAL</span>
+                    </div>
+                  </div>
+
+                  <!-- Visual hero panel -->
+                  <div class="relative rounded-3xl overflow-hidden border border-white/8 bg-black/40 min-h-[230px] sm:min-h-[270px]">
+                    <div class="absolute inset-0 line-grid opacity-80"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/16 via-transparent to-blue-500/10"></div>
+
+                    <!-- Studio illustration made with CSS -->
+                    <div class="absolute left-6 right-6 top-8 h-24 rounded-2xl bg-[#10131D] border border-[#D4AF37]/25 shadow-2xl">
+                      <div class="absolute inset-3 rounded-xl bg-black/45 border border-white/8 flex items-center justify-center">
+                        <div class="text-center">
+                          <div class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-[0.2em]">Smart Board</div>
+                          <div class="text-white font-black text-lg mt-1">Better Lessons</div>
+                        </div>
+                      </div>
+                      <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-16 h-6 bg-black/50 border-x border-b border-white/8 rounded-b-xl"></div>
+                    </div>
+
+                    <div class="absolute left-7 bottom-9 w-24 h-24 rounded-3xl bg-[#0A0C12] border border-[#D4AF37]/25 shadow-[0_20px_70px_rgba(0,0,0,0.65)] rotate-[-6deg] flex items-center justify-center">
+                      <div class="w-14 h-14 rounded-full bg-black border-4 border-[#D4AF37]/50 flex items-center justify-center">
+                        <div class="w-6 h-6 rounded-full bg-[#D4AF37]/80"></div>
+                      </div>
+                      <div class="absolute -right-4 top-9 w-8 h-5 rounded-lg bg-[#D4AF37]/30 border border-[#D4AF37]/30"></div>
+                      <div class="absolute -bottom-7 w-1 h-7 bg-[#D4AF37]/35"></div>
+                    </div>
+
+                    <div class="absolute right-6 bottom-7 glass rounded-2xl p-3 w-44 shadow-2xl">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 recording-dot"></span>
+                        <span class="text-[10px] font-mono text-red-300 uppercase">Recording Ready</span>
+                      </div>
+                      <div class="h-1.5 bg-white/8 rounded-full overflow-hidden mb-2">
+                        <div class="h-full w-[72%] bg-gradient-to-r from-[#D4AF37] to-[#F7E7B4] rounded-full"></div>
+                      </div>
+                      <div class="text-[10px] text-slate-400">Camera + Smart Board + Zoom</div>
+                    </div>
+                  </div>
+
+                  <!-- Portal preview cards -->
+                  <div class="relative grid grid-cols-2 gap-3 mt-4">
+                    <div class="p-4 rounded-2xl bg-[#D4AF37]/8 border border-[#D4AF37]/20">
+                      <div class="text-[9px] text-slate-400 font-mono uppercase mb-1">Package Hours</div>
+                      <div class="text-2xl font-black text-white">12<span class="text-xs text-[#D4AF37] ml-1">/20h</span></div>
+                      <div class="mt-2 h-1.5 bg-white/8 rounded-full overflow-hidden">
+                        <div class="h-full w-[60%] bg-gradient-to-r from-[#D4AF37] to-[#F7E7B4] rounded-full"></div>
+                      </div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-500/8 border border-emerald-500/20">
+                      <div class="text-[9px] text-slate-400 font-mono uppercase mb-1">Balance Due</div>
+                      <div class="text-xl font-black text-emerald-300">Rs. 4,000</div>
+                      <div class="text-[10px] text-slate-500 mt-1">Auto payment tracking</div>
+                    </div>
+                    <div class="col-span-2 p-4 rounded-2xl bg-blue-500/8 border border-blue-500/20 flex items-center justify-between gap-4">
+                      <div>
+                        <div class="text-[9px] font-mono text-blue-300 uppercase font-bold mb-1">Next Booking</div>
+                        <div class="text-sm font-bold text-white">Online Class Studio Session</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Zoom link • meeting ID • passcode</div>
+                      </div>
+                      <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-500/30 items-center justify-center text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Floating labels -->
+                <div class="absolute -top-4 -right-2 sm:-right-5 glass-gold rounded-2xl px-3 py-2 text-[10px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xl">
+                  <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                  SQLite Connected
+                </div>
+                <div class="absolute -bottom-4 -left-2 sm:-left-5 glass-gold rounded-2xl px-3 py-2 text-[10px] font-mono text-[#D4AF37] shadow-xl flex items-center gap-1.5">
+                   Google Sheets Sync
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- FACILITIES -->
+      <section class="py-24 bg-[#0A0C14] border-t border-white/4" id="facilities">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="badge-gold text-xs mb-3 inline-block">WORLD-CLASS GEAR</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">Professional Studio Facilities</h2>
+            <p class="text-sm text-slate-400 mt-3">Engineered for online educators, tutors, and content creators.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card-gold-3d rounded-2xl p-7 tilt-card">
+              <div class="w-12 h-12 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center mb-5 text-[#D4AF37] shadow-lg shadow-[#D4AF37]/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Sony FX Cinema 4K</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">Prime lenses, eye autofocus, clean HDMI output, and optical teleprompter for professional content.</p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="badge-gold text-[10px]">4K 60FPS</span>
+                <span class="badge-gold text-[10px]">Eye AF</span>
+                <span class="badge-gold text-[10px]">HDMI Out</span>
+              </div>
+            </div>
+            <div class="card-gold-3d rounded-2xl p-7 tilt-card">
+              <div class="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center mb-5 text-blue-400 shadow-lg shadow-blue-500/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Zoom Live Teaching</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">Direct Zoom meeting link integration, eye-level student monitor, and Stream Deck for seamless live teaching.</p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="badge-blue text-[10px]">Zoom Ready</span>
+                <span class="badge-blue text-[10px]">Dual Monitors</span>
+                <span class="badge-blue text-[10px]">Stream Deck</span>
+              </div>
+            </div>
+            <div class="card-gold-3d rounded-2xl p-7 tilt-card">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5 text-emerald-400 shadow-lg shadow-emerald-500/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8m-4-4v4M9 8h6m-6 4h4"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">75" 4K Smart Board</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">Zero-latency stylus writing, anti-glare 4K display, and instant PDF note export for students after class.</p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="badge-green text-[10px]">Anti-Glare 4K</span>
+                <span class="badge-green text-[10px]">Zero Latency</span>
+                <span class="badge-green text-[10px]">PDF Export</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PACKAGES -->
+      <section class="py-24 bg-[#07080D] border-t border-white/4" id="packages">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="badge-gold text-xs mb-3 inline-block">TRANSPARENT PRICING</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">Studio Booking Plans</h2>
+            <p class="text-sm text-slate-400 mt-3">Automated package hours tracking in your client portal.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <!-- Hourly -->
+            <div class="card-3d rounded-3xl p-8 flex flex-col justify-between tilt-card">
+              <div>
+                <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">PAY AS YOU GO</span>
+                <h3 class="text-2xl font-bold text-white mt-2 mb-6">Hourly Booking</h3>
+                <div class="mb-7">
+                  <div class="text-4xl font-black text-white">Rs. 3,000</div>
+                  <div class="text-[11px] text-[#D4AF37] font-mono mt-1">First 2 Hours (Rs. 1,500/hr after)</div>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-300">
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span>Sony 4K Camera + Smart Board</li>
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span>Zoom Online Teaching Setup</li>
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span>Silent AC & Audio Operator</li>
+                </ul>
+              </div>
+              <button onclick="handleSelectPackage('Hourly Booking', 3000, 2)" class="mt-8 w-full py-3.5 rounded-xl text-sm font-bold uppercase text-white bg-white/8 hover:bg-white/12 border border-white/10 hover:border-[#D4AF37]/30 transition-all tracking-wider">
+                Select Hourly Slot
+              </button>
+            </div>
+
+            <!-- Monthly — featured -->
+            <div class="card-gold-3d rounded-3xl p-8 flex flex-col justify-between tilt-card relative overflow-hidden anim-border">
+              <div class="absolute top-4 right-4"><span class="badge-gold text-[10px]">★ MOST POPULAR</span></div>
+              <div>
+                <span class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest">CREATOR MEMBERSHIP</span>
+                <h3 class="text-2xl font-bold text-white mt-2 mb-6">Monthly Creator Package</h3>
+                <div class="mb-7">
+                  <div class="text-4xl font-black gold-gradient-text">Rs. 12,000</div>
+                  <div class="text-[11px] text-emerald-400 font-mono mt-1">Includes 20 Total Studio Hours</div>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-200">
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-[#D4AF37]/15 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span><strong>20 Hours Studio Time</strong> in 30 days</li>
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-[#D4AF37]/15 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span>Automated Portal & Zoom Link Generator</li>
+                  <li class="flex items-center gap-2.5"><span class="w-4 h-4 rounded-full bg-[#D4AF37]/15 flex items-center justify-center text-[10px] text-[#D4AF37] font-bold shrink-0">✓</span>Priority Booking & Teleprompter Access</li>
+                </ul>
+              </div>
+              <button onclick="handleSelectPackage('Monthly Package', 12000, 20)" class="mt-8 w-full py-3.5 rounded-xl text-sm font-bold uppercase text-black gold-gradient-bg shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all tracking-wider relative overflow-hidden shimmer-effect">
+                Subscribe to Monthly
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BANK DETAILS -->
+      <section class="py-24 bg-[#0A0C14] border-t border-white/4" id="bank">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="badge-gold text-xs mb-3 inline-block">SECURE PAYMENT</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">Direct Bank Transfer</h2>
+            <p class="text-sm text-slate-400 mt-3">Deposit directly and upload receipts in your portal for instant verification.</p>
+          </div>
+
+          <div class="max-w-4xl mx-auto card-gold-3d rounded-3xl p-8 anim-border">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Account Details -->
+              <div class="space-y-5">
+                <div class="flex items-center gap-2 mb-6">
+                  <div class="w-10 h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 10v11m4-11v11m6-11v11m4-11v11M4 10l8-6 8 6"/></svg>
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-mono text-slate-500 uppercase">Official Studio Account</div>
+                    <div class="text-sm font-bold text-white">People's Bank Sri Lanka</div>
+                  </div>
+                </div>
+                <div>
+                  <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block mb-1">Beneficiary Name</span>
+                  <div class="flex items-center justify-between">
+                    <span class="text-white font-bold text-base" id="dispAccountName">E.M.S.S. Fonseka</span>
+                    <button onclick="copyToClipboard('E.M.S.S. Fonseka')" class="text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded-md bg-white/5 font-mono transition-colors">Copy</button>
+                  </div>
+                </div>
+                <div>
+                  <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block mb-1">Bank & Branch</span>
+                  <div class="text-white font-semibold" id="dispBankName">People's Bank</div>
+                  <div class="text-slate-400 text-sm" id="dispBranch">Godakawela Branch</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-[#D4AF37]/6 border border-[#D4AF37]/20">
+                  <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block mb-2">Account Number</span>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="text-[#D4AF37] font-mono text-xl font-black tracking-[0.08em]" id="dispAccountNum">245200290056879</div>
+                    <button onclick="copyToClipboard('245200290056879')" class="px-3 py-1.5 rounded-xl gold-gradient-bg text-black font-bold text-xs whitespace-nowrap shadow hover:shadow-[0_0_16px_rgba(212,175,55,0.4)] transition-all">Copy A/C</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- How to Pay -->
+              <div class="p-6 rounded-2xl bg-black/40 border border-white/6 flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-wider font-bold block mb-4">How to Pay & Verify</span>
+                  <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-[#D4AF37]/12 text-[#D4AF37] flex items-center justify-center font-bold font-mono text-[10px] shrink-0 mt-0.5">1</span>
+                      <span class="text-sm text-slate-300">Transfer funds via online banking, CDM, or bank counter.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-[#D4AF37]/12 text-[#D4AF37] flex items-center justify-center font-bold font-mono text-[10px] shrink-0 mt-0.5">2</span>
+                      <span class="text-sm text-slate-300">Take a photo or download your digital receipt/transfer slip.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-[#D4AF37]/12 text-[#D4AF37] flex items-center justify-center font-bold font-mono text-[10px] shrink-0 mt-0.5">3</span>
+                      <span class="text-sm text-slate-300">Upload slip in your <strong class="text-white">Customer Portal</strong> or WhatsApp to <a href="https://wa.me/94702663137" target="_blank" class="text-emerald-400 font-mono underline">0702663137</a>.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold font-mono text-[10px] shrink-0 mt-0.5">✓</span>
+                      <span class="text-sm text-slate-300">Admin verifies in the database and your balance updates automatically.</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="pt-4 border-t border-white/5 flex items-center justify-between mt-4">
+                  <span class="text-[11px] text-slate-500 font-mono">Support: 0702663137</span>
+                  <button onclick="openAuthModal('login')" class="text-[#D4AF37] hover:underline text-xs font-semibold">Login to Upload Slip →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REVIEWS -->
+      <section class="py-24 bg-[#07080D] border-t border-white/4" id="reviews">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div>
+              <span class="badge-gold text-xs mb-3 inline-block">VERIFIED TESTIMONIALS</span>
+              <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">Client Reviews & Ratings</h2>
+              <p class="text-sm text-slate-400 mt-2">Genuine testimonials from verified educators and creators.</p>
+            </div>
+            <button onclick="handleWriteReviewClick()" class="px-6 py-3 rounded-xl text-sm font-bold uppercase gold-gradient-bg text-black shadow hover:shadow-[0_0_24px_rgba(212,175,55,0.35)] transition-all">
+              Write A Review
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="publicReviewsGrid"></div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="py-24 bg-[#0A0C14] border-t border-white/4 relative overflow-hidden" id="contact">
+        <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="text-center max-w-2xl mx-auto mb-14">
+            <span class="badge-gold text-xs mb-3 inline-block">GET IN TOUCH</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">Contact & Studio Location</h2>
+            <p class="text-sm text-slate-400 mt-3">Ready to elevate your online lectures? Contact our team today.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div class="card-3d rounded-3xl p-8 text-center space-y-4 group tilt-card">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#D4AF37]/12 border border-[#D4AF37]/25 flex items-center justify-center text-[#D4AF37] group-hover:scale-110 transition-transform shadow-lg shadow-[#D4AF37]/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white">Call / Hotline</h3>
+              <p class="text-xs text-slate-400">Direct studio hotline for slot reservations and customer care.</p>
+              <a href="tel:0702663137" class="block text-xl font-mono font-black text-[#D4AF37] hover:underline">0702663137</a>
+              <a href="tel:0702663137" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase gold-gradient-bg text-black inline-flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all">Call Studio</a>
+            </div>
+
+            <div class="card-3d rounded-3xl p-8 text-center space-y-4 group tilt-card border-[#25D366]/20">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#25D366]/10 border border-[#25D366]/25 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                <svg class="w-7 h-7 fill-current text-[#25D366]" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 17.76c-1.49 0-2.94-.4-4.22-1.16l-.3-.18-3.13.82.84-3.05-.2-.31c-.84-1.34-1.28-2.9-1.28-4.5 0-4.63 3.77-8.4 8.4-8.4 2.25 0 4.36.88 5.95 2.47 1.59 1.59 2.46 3.7 2.46 5.94 0 4.63-3.77 8.4-8.4 8.4zm4.6-6.28c-.25-.13-1.49-.74-1.72-.82-.23-.08-.4-.13-.57.13-.17.25-.66.82-.81.99-.15.17-.3.19-.55.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.87-.21-.5-.42-.43-.57-.44l-.49-.01c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.42 1.44.54.61.19 1.16.17 1.6.1 1.16-.07 1.49-.61 1.7-1.19.21-.58.21-1.08.15-1.19-.06-.11-.23-.17-.48-.3z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white">WhatsApp</h3>
+              <p class="text-xs text-slate-400">Quick inquiries, slip confirmation, and instant support.</p>
+              <a href="https://wa.me/94702663137?text=Hello%20Think%20Studio!" target="_blank" class="block text-xl font-mono font-black text-emerald-400 hover:underline">070 266 3137</a>
+              <a href="https://wa.me/94702663137?text=Hello%20Think%20Studio!" target="_blank" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase bg-emerald-600 hover:bg-emerald-500 text-white inline-flex items-center justify-center gap-2 transition-all">Chat on WhatsApp</a>
+            </div>
+
+            <div class="card-3d rounded-3xl p-8 text-center space-y-4 group tilt-card">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-blue-500/12 border border-blue-500/25 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white">Official Email</h3>
+              <p class="text-xs text-slate-400">Corporate bookings, invoicing, and institutional partnerships.</p>
+              <a href="mailto:thinkstudiocontact@gmail.com" class="block text-xs font-mono font-bold text-blue-400 hover:underline break-all">thinkstudiocontact@gmail.com</a>
+              <a href="mailto:thinkstudiocontact@gmail.com?subject=Think%20Studio%20Booking" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase bg-white/8 hover:bg-white/14 text-white border border-white/10 inline-flex items-center justify-center gap-2 transition-all">Send Email</a>
+            </div>
+          </div>
+
+          <!-- Location Banner -->
+          <div class="mt-10 p-6 rounded-2xl card-gold-3d max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] shrink-0 shadow-lg shadow-[#D4AF37]/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-white">Studio Location & Hours</h4>
+                <p class="text-sm text-slate-400 mt-0.5">Godakawela, Sri Lanka • Open Daily 7:00 AM — 11:00 PM</p>
+                <p class="text-xs text-slate-500">Fully air-conditioned acoustic studio with 75" Smart Board, 4K camera & live Zoom.</p>
+              </div>
+            </div>
+            <button onclick="openBookingModal('Studio Booking')" class="px-6 py-3 rounded-xl gold-gradient-bg text-black font-bold uppercase text-sm shadow hover:shadow-[0_0_24px_rgba(212,175,55,0.35)] transition-all whitespace-nowrap">Book a Slot Now</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="bg-[#06070C] border-t border-white/6 py-14 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10 pb-10 border-b border-white/5">
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/25 flex items-center justify-center text-xs font-black text-[#D4AF37]">TS</div>
+                <span class="text-lg font-black text-white">THINK <span class="text-[#D4AF37]">STUDIO</span></span>
+              </div>
+              <p class="text-[11px] text-slate-400 italic">Create. Teach. Record. Grow.</p>
+              <p class="text-[11px] text-slate-500">Professional Online Teaching & Content Creation Studio for educators, YouTubers, and businesses.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-[#D4AF37] uppercase tracking-wider text-[10px] mb-4">Quick Links</h4>
+              <ul class="space-y-2.5 text-[11px]">
+                <li><a href="javascript:void(0)" onclick="navigateTo('public','services')" class="hover:text-white transition-colors">Services</a></li>
+                <li><a href="javascript:void(0)" onclick="navigateTo('public','facilities')" class="hover:text-white transition-colors">Studio Facilities</a></li>
+                <li><a href="javascript:void(0)" onclick="navigateTo('public','packages')" class="hover:text-white transition-colors">Packages & Pricing</a></li>
+                <li><a href="javascript:void(0)" onclick="navigateTo('public','reviews')" class="hover:text-white transition-colors">Client Reviews</a></li>
+                <li><a href="javascript:void(0)" onclick="navigateTo('public','bank')" class="hover:text-white transition-colors">Official Bank Account</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-bold text-[#D4AF37] uppercase tracking-wider text-[10px] mb-4">Direct Contact</h4>
+              <ul class="space-y-2.5 font-mono text-[11px]">
+                <li class="flex items-center gap-2"> <a href="tel:0702663137" class="hover:text-[#D4AF37] transition-colors">0702663137</a></li>
+                <li class="flex items-center gap-2"> <a href="https://wa.me/94702663137" target="_blank" class="hover:text-emerald-400 transition-colors">WhatsApp: 0702663137</a></li>
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-blue-400 shrink-0 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <a href="mailto:thinkstudiocontact@gmail.com" class="hover:text-white transition-colors break-all">thinkstudiocontact@gmail.com</a></li>
+                <li class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-slate-400 shrink-0 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span>Godakawela, Sri Lanka</span></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-bold text-[#D4AF37] uppercase tracking-wider text-[10px] mb-4">Official Bank</h4>
+              <div class="p-4 rounded-xl card-gold-3d space-y-1.5 text-[11px]">
+                <p class="text-white font-semibold">People's Bank</p>
+                <p class="text-slate-400">E.M.S.S. Fonseka</p>
+                <p class="font-mono text-[#D4AF37] font-bold tracking-wider">245200290056879</p>
+                <p class="text-[10px] text-slate-500">Godakawela Branch</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-600">
+            <p>© 2026 Think Studio. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+              <a href="javascript:void(0)" onclick="openAuthModal('login')" class="hover:text-slate-400 transition-colors">Staff & Client Login</a>
+              <span>•</span>
+              <a href="tel:0702663137" class="hover:text-slate-400 transition-colors">Hotline: 0702663137</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- ==================== VIEW 2: CUSTOMER DASHBOARD ==================== -->
+    <div id="viewUserDashboard" class="hidden min-h-screen bg-[#07080D]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/6 gap-4">
+          <div>
+            <span class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest">CUSTOMER PORTAL</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white flex items-center gap-3 mt-1">
+              Hello, <span id="userDashName">User</span>
+              <span class="badge-green text-[10px]">ACTIVE CLIENT</span>
+            </h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="openBookingModal('Book with Package Hours')" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase gold-gradient-bg text-black shadow hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">+ Book Studio Slot</button>
+            <button onclick="navigateTo('public')" class="px-4 py-2.5 rounded-xl text-xs glass hover:border-white/14 text-slate-300 transition-all">&larr; Website</button>
+          </div>
+        </div>
+
+        <!-- Dashboard Tabs -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-semibold" style="scrollbar-width:none">
+          <button onclick="setUserDashTab('overview')" id="uTabBtn-overview" class="user-dash-tab active whitespace-nowrap px-4 py-2.5 rounded-xl bg-[#D4AF37] text-black font-bold flex items-center gap-2 transition-all">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v8H3v-8zm7-10h4v18h-4V3zm7 6h4v12h-4V9z"/></svg>
+            <span>Overview</span>
+          </button>
+          <button onclick="setUserDashTab('package')" id="uTabBtn-package" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>My Package</span>
+          </button>
+          <button onclick="setUserDashTab('bookings')" id="uTabBtn-bookings" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Bookings & Zoom</span>
+          </button>
+          <button onclick="setUserDashTab('payments')" id="uTabBtn-payments" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>Payments</span>
+          </button>
+          <button onclick="setUserDashTab('bank')" id="uTabBtn-bank" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 10v11m4-11v11m6-11v11m4-11v11M4 10l8-6 8 6"/></svg>
+            <span>Bank Account</span>
+          </button>
+          <button onclick="setUserDashTab('reviews')" id="uTabBtn-reviews" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Reviews</span>
+          </button>
+          <button onclick="setUserDashTab('profile')" id="uTabBtn-profile" class="user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </button>
+        </div>
+
+        <!-- USER TAB: OVERVIEW -->
+        <div id="uTab-overview" class="space-y-6 fade-in">
+          <!-- KPI Bento Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Hours Card with progress bar -->
+            <div class="card-gold-3d rounded-2xl p-5 col-span-1 sm:col-span-2 lg:col-span-1">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] text-slate-500 font-mono uppercase">Remaining Hours</span>
+                <span class="text-[10px] text-[#D4AF37] font-mono" id="statUsedHoursText">8 used</span>
+              </div>
+              <div class="flex items-baseline gap-2 mb-3">
+                <span class="text-4xl font-black text-white" id="statRemainingHours">12</span>
+                <span class="text-sm text-[#D4AF37]">/ <span id="statTotalHours">20</span> hrs</span>
+              </div>
+              <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                <div id="hoursProgressPercent" class="bg-gradient-to-r from-[#D4AF37] to-[#F7E7B4] h-full rounded-full transition-all duration-1000" style="width:60%"></div>
+              </div>
+            </div>
+
+            <div class="card-3d rounded-2xl p-5">
+              <span class="text-[10px] text-slate-500 font-mono uppercase block mb-2">Package</span>
+              <div class="text-base font-bold text-white leading-tight" id="statPackageName">Monthly Package</div>
+              <div class="text-emerald-400 text-sm font-mono font-bold mt-1" id="statPackageCost">Rs. 12,000</div>
+              <div class="text-[10px] text-slate-500 mt-2 font-mono" id="statExpiryDate">Valid: 2026-10-28</div>
+            </div>
+
+            <div class="card-3d rounded-2xl p-5 border-amber-500/15">
+              <span class="text-[10px] text-slate-500 font-mono uppercase block mb-2">Outstanding Balance</span>
+              <div class="text-3xl font-black text-amber-400 mt-1" id="statOutstandingBalance">Rs. 0</div>
+              <button onclick="setUserDashTab('payments')" class="mt-2 text-[10px] text-[#D4AF37] underline block">Upload bank slip →</button>
+            </div>
+
+            <div class="card-3d rounded-2xl p-5 border-cyan-500/15">
+              <span class="text-[10px] text-slate-500 font-mono uppercase block mb-2">Next Session</span>
+              <div class="text-sm font-bold text-white mt-1" id="statNextBooking">—</div>
+              <div class="text-[10px] text-cyan-400 mt-1">75" Smart Board • Zoom Rig</div>
+              <button onclick="setUserDashTab('bookings')" class="mt-2 text-[10px] text-slate-400 underline block">View bookings →</button>
+            </div>
+          </div>
+
+          <!-- Zoom Console -->
+          <div class="p-6 rounded-2xl bg-gradient-to-r from-[#0D1526] to-[#0E1018] border border-blue-500/30 space-y-4 shadow-xl glow-blue">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/10">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono uppercase text-blue-400 font-bold">STUDIO ZOOM BROADCAST</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block"></span>
+                    <span class="text-[9px] font-mono text-emerald-400">LIVE READY</span>
+                  </div>
+                  <h4 class="text-sm font-bold text-white mt-0.5" id="dashNextZoomTopic">Next Session Loading...</h4>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="copyToClipboard(document.getElementById('dashZoomUrlLink').textContent.trim())" class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase bg-blue-600/25 hover:bg-blue-600/40 text-blue-300 border border-blue-500/35 flex items-center gap-2 transition-all">
+                   Copy Zoom Link
+                </button>
+                <button onclick="copyCurrentZoomDetails()" class="px-4 py-2.5 rounded-xl text-xs font-semibold glass hover:border-white/16 text-slate-200 flex items-center gap-1.5 transition-all">
+                  <svg class="w-3.5 h-3.5 text-blue-400 shrink-0 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Student Invite
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/6 text-xs font-mono">
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between">
+                <div class="truncate mr-2">
+                  <span class="text-slate-500 block text-[10px] mb-0.5">ZOOM URL</span>
+                  <span id="dashZoomUrlLink" class="text-blue-400 font-semibold truncate block select-all">https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026</span>
+                </div>
+                <button onclick="copyToClipboard(document.getElementById('dashZoomUrlLink').textContent.trim())" class="text-slate-400 hover:text-white text-[10px] bg-white/8 px-2 py-0.5 rounded ml-1 shrink-0">Copy</button>
+              </div>
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between">
+                <div>
+                  <span class="text-slate-500 block text-[10px] mb-0.5">MEETING ID</span>
+                  <span class="text-white font-bold block" id="dashZoomIdText">845 2319 4022</span>
+                </div>
+                <button onclick="copyToClipboard(document.getElementById('dashZoomIdText').textContent)" class="text-slate-400 hover:text-white text-[10px]">Copy</button>
+              </div>
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between">
+                <div>
+                  <span class="text-slate-500 block text-[10px] mb-0.5">PASSCODE</span>
+                  <span class="text-[#D4AF37] font-bold block" id="dashZoomPassText">THINK2026</span>
+                </div>
+                <button onclick="copyToClipboard(document.getElementById('dashZoomPassText').textContent)" class="text-slate-400 hover:text-white text-[10px]">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER TAB: PACKAGE -->
+        <div id="uTab-package" class="hidden space-y-6 fade-in">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="card-gold-3d rounded-2xl p-6 space-y-3">
+              <h3 class="text-xl font-bold text-white" id="pkgDetailTitle">Monthly Package</h3>
+              <div class="text-2xl font-black gold-gradient-text" id="pkgDetailPrice">Rs. 12,000</div>
+              <div class="text-xs text-slate-300 space-y-2.5 pt-3 border-t border-white/6">
+                <div class="flex justify-between"><span class="text-slate-400">Total Hours:</span><span id="pkgDetailTotalHours" class="font-bold text-white">20 Hours</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Used:</span><span id="pkgDetailUsedHours" class="text-amber-400 font-bold">8 Hours</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Remaining:</span><span id="pkgDetailRemainHours" class="text-emerald-400 font-bold">12 Hours</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Start Date:</span><span id="pkgDetailStartDate">—</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Renewal Date:</span><span id="pkgDetailEndDate">—</span></div>
+              </div>
+              <button onclick="openBookingModal('Renew Package')" class="w-full mt-4 py-3 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Renew / Top Up Hours</button>
+            </div>
+            <div class="card-3d rounded-2xl p-6 lg:col-span-2 overflow-x-auto">
+              <h4 class="text-sm font-bold text-white mb-4">Hours Deduction History</h4>
+              <table class="data-table"><tbody id="packageDeductionsTableBody" class="divide-y divide-white/4"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER TAB: BOOKINGS -->
+        <div id="uTab-bookings" class="hidden space-y-4 fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-white">Sessions & Zoom Meeting Rooms</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Launch live meetings or copy student invitations.</p>
+            </div>
+            <button onclick="openBookingModal('New Slot')" class="px-4 py-2.5 rounded-xl gold-gradient-bg text-black font-bold text-xs">+ Book Slot</button>
+          </div>
+          <div class="overflow-x-auto rounded-2xl card-3d border-0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Session Date & Time</th><th>Purpose</th><th>Setup</th><th>Zoom Link</th><th>Duration</th><th>Status</th><th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="userBookingsTableBody" class="divide-y divide-white/4 text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- USER TAB: PAYMENTS -->
+        <div id="uTab-payments" class="hidden space-y-6 fade-in">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card-gold-3d rounded-2xl p-6 space-y-4">
+              <h3 class="text-base font-bold text-white">Upload Bank Slip</h3>
+              <form onsubmit="handleCustomerSlipUpload(event)" class="space-y-3 text-xs">
+                <input type="number" id="slipAmount" required placeholder="Amount Transferred (Rs.)" class="input-dark">
+                <input type="text" id="slipRef" required placeholder="Bank Reference Code" class="input-dark">
+                <div class="p-3 rounded-xl bg-white/3 border border-white/6 border-dashed text-center cursor-pointer hover:bg-white/6 transition-all">
+                  <input type="file" id="slipFile" accept="image/*,.pdf" required class="hidden">
+                  <label for="slipFile" class="cursor-pointer block">
+                    <div class="text-2xl mb-1"></div>
+                    <div class="text-xs text-slate-400">Click to attach payment slip (image/PDF)</div>
+                  </label>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl gold-gradient-bg text-black font-bold text-xs uppercase hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Submit Slip for Verification</button>
+                <div id="slipSuccessMsg" class="hidden text-xs text-emerald-400 text-center font-semibold">✓ Slip submitted for verification!</div>
+              </form>
+            </div>
+            <div class="card-3d rounded-2xl p-6 overflow-x-auto">
+              <h3 class="text-base font-bold text-white mb-4">Payment Receipts</h3>
+              <table class="data-table"><tbody id="userPaymentsTableBody" class="divide-y divide-white/4"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER TAB: BANK -->
+        <div id="uTab-bank" class="hidden space-y-6 fade-in">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+            <div class="card-gold-3d rounded-2xl p-6 space-y-3 text-sm">
+              <span class="text-[10px] font-mono text-[#D4AF37] uppercase">Official Studio Account</span>
+              <h3 class="text-base font-bold text-white">Think Studio Bank Details</h3>
+              <p><span class="text-slate-400">Bank:</span> <span class="text-white font-semibold">People's Bank</span></p>
+              <p><span class="text-slate-400">Account Name:</span> <span class="text-white font-semibold">E.M.S.S. Fonseka</span></p>
+              <p><span class="text-slate-400">Account:</span> <span class="font-mono text-[#D4AF37] font-black text-base tracking-wider">245200290056879</span> <button onclick="copyToClipboard('245200290056879')" class="ml-2 text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-white/5 font-mono">Copy</button></p>
+              <p><span class="text-slate-400">Branch:</span> <span class="text-white">Godakawela Branch</span></p>
+            </div>
+            <div class="card-3d rounded-2xl p-6 space-y-3 text-sm">
+              <span class="text-[10px] font-mono text-emerald-400 uppercase">Support & Hotline</span>
+              <h3 class="text-base font-bold text-white">Direct Verification Support</h3>
+              <p><span class="text-slate-400">Hotline:</span> <a href="tel:0702663137" class="text-[#D4AF37] font-mono font-bold hover:underline">0702663137</a></p>
+              <p><span class="text-slate-400">WhatsApp:</span> <a href="https://wa.me/94702663137" target="_blank" class="text-emerald-400 font-mono hover:underline">070 266 3137</a></p>
+              <p><span class="text-slate-400">Email:</span> <a href="mailto:thinkstudiocontact@gmail.com" class="text-blue-400 hover:underline text-xs">thinkstudiocontact@gmail.com</a></p>
+              <p class="text-xs text-slate-400">Send deposit slip on WhatsApp for immediate package recharge.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER TAB: REVIEWS -->
+        <div id="uTab-reviews" class="hidden space-y-4 fade-in">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-white">My Reviews</h3>
+            <button onclick="openReviewModal()" class="px-4 py-2.5 rounded-xl gold-gradient-bg text-black font-bold text-xs">+ Write Review</button>
+          </div>
+          <div id="userReviewsContainer" class="space-y-3"></div>
+        </div>
+
+        <!-- USER TAB: PROFILE -->
+        <div id="uTab-profile" class="hidden fade-in">
+          <div class="max-w-md card-3d rounded-2xl p-6 space-y-4">
+            <h3 class="text-base font-bold text-white">Profile Settings</h3>
+            <form onsubmit="handleUpdateProfile(event)" class="space-y-3">
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Full Name</label>
+                <input type="text" id="profName" class="input-dark">
+              </div>
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Email (read-only)</label>
+                <input type="email" id="profEmail" readonly class="input-dark opacity-50 cursor-not-allowed">
+              </div>
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Phone</label>
+                <input type="tel" id="profPhone" class="input-dark">
+              </div>
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Institution / Channel</label>
+                <input type="text" id="profOrg" placeholder="Institution / Channel" class="input-dark">
+              </div>
+              <div class="flex items-center gap-3">
+                <button type="submit" class="px-5 py-2.5 rounded-xl gold-gradient-bg text-black font-bold text-xs uppercase">Save Profile</button>
+                <span id="profSavedMsg" class="hidden text-xs text-emerald-400 font-semibold">✓ Saved!</span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 3: ADMIN DASHBOARD ==================== -->
+    <div id="viewAdminDashboard" class="hidden min-h-screen bg-[#07080D]">
+      <div class="flex">
+
+        <!-- Admin Left Sidebar -->
+        <aside id="adminSidebar" class="w-56 min-h-screen bg-[#0A0C14] border-r border-white/6 flex-col fixed top-0 pt-[88px] z-30 hidden lg:flex">
+          <div class="px-3 py-4 flex-1 space-y-1">
+            <div class="px-3 py-1 mb-2">
+              <span class="text-[9px] font-mono text-slate-600 uppercase tracking-widest">Navigation</span>
+            </div>
+            <button onclick="setAdminDashTab('overview')" id="aTabBtn-overview" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-semibold text-[#D4AF37] bg-[#D4AF37]/8 border-l-2 border-[#D4AF37] transition-all">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v8H3v-8zm7-10h4v18h-4V3zm7 6h4v12h-4V9z"/></svg>
+              <span>Overview</span>
+            </button>
+            <button onclick="setAdminDashTab('users')" id="aTabBtn-users" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Clients</span>
+            </button>
+            <button onclick="setAdminDashTab('packages')" id="aTabBtn-packages" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              <span>Packages</span>
+            </button>
+            <button onclick="setAdminDashTab('bookings')" id="aTabBtn-bookings" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Bookings</span>
+            </button>
+            <button onclick="setAdminDashTab('payments')" id="aTabBtn-payments" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <span>Payments</span>
+              <span id="adminPendingSlipsBadge" class="ml-auto badge-amber text-[10px] px-2">0</span>
+            </button>
+            <button onclick="setAdminDashTab('reviews')" id="aTabBtn-reviews" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Reviews</span>
+            </button>
+            <button onclick="setAdminDashTab('settings')" id="aTabBtn-settings" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </button>
+            <button onclick="setAdminDashTab('gsheet')" id="aTabBtn-gsheet" class="admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-emerald-400 hover:bg-emerald-500/8 transition-all border-l-2 border-transparent">
+              <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+              <span>Google Sheets</span>
+              <span class="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </button>
+          </div>
+          <div class="px-3 py-4 border-t border-white/5 space-y-1">
+            <button onclick="navigateTo('public')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all text-left">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>View Website</span>
+            </button>
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/8 transition-all text-left">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Mobile Admin Tab Bar (visible on mobile only) -->
+        <div class="lg:hidden w-full fixed bottom-0 left-0 z-40 bg-[#0A0C14]/95 border-t border-white/6 backdrop-blur-xl px-2 py-2 flex items-center justify-around gap-1" style="scrollbar-width:none">
+          <button onclick="setAdminDashTab('overview')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Overview">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v8H3v-8zm7-10h4v18h-4V3zm7 6h4v12h-4V9z"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('users')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Clients">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('packages')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Packages">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('bookings')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Bookings">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('payments')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Payments">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('gsheet')" class="p-2 rounded-xl text-emerald-400 hover:text-emerald-300 transition-colors" title="Google Sheets">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+          </button>
+          <button onclick="setAdminDashTab('settings')" class="p-2 rounded-xl text-slate-400 hover:text-[#D4AF37] focus:text-[#D4AF37] transition-colors" title="Settings">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
+
+        <!-- Admin Main Content -->
+        <div class="flex-1 lg:ml-56">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 space-y-6">
+
+            <div class="flex justify-between items-center pb-5 border-b border-white/6">
+              <div>
+                <span class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest">Admin Panel</span>
+                <h2 class="text-2xl font-black text-white mt-1">Studio Operations</h2>
+              </div>
+              <button onclick="navigateTo('public')" class="px-4 py-2 rounded-xl glass hover:border-white/14 text-xs text-slate-300 lg:hidden transition-all">&larr; Website</button>
+            </div>
+
+            <!-- ADMIN TAB: OVERVIEW -->
+            <div id="aTab-overview" class="space-y-5 fade-in">
+              <!-- KPI Cards Bento -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="card-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Clients</span>
+                  <div class="text-2xl font-black text-white mt-1" id="kpiTotalUsers">0</div>
+                </div>
+                <div class="card-gold-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Active Pkgs</span>
+                  <div class="text-2xl font-black text-[#D4AF37] mt-1" id="kpiActivePackages">0</div>
+                </div>
+                <div class="card-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Revenue</span>
+                  <div class="text-lg font-black text-emerald-400 mt-1" id="kpiTotalCollected">Rs. 0</div>
+                </div>
+                <div class="card-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Due</span>
+                  <div class="text-lg font-black text-amber-400 mt-1" id="kpiDueBalances">Rs. 0</div>
+                </div>
+                <div class="card-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Rating</span>
+                  <div class="text-2xl font-black text-white mt-1">4.9/5</div>
+                </div>
+                <div class="card-3d rounded-2xl p-4 col-span-1">
+                  <span class="text-[9px] text-slate-500 font-mono uppercase block">Sessions</span>
+                  <div class="text-2xl font-black text-cyan-400 mt-1" id="kpiUpcomingBookings">0</div>
+                </div>
+              </div>
+
+              <!-- Google Sheet Sync Banner -->
+              <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-[#0E1018] to-[#0E1018] border border-emerald-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4 glow-emerald">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl shrink-0"></div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] font-mono uppercase text-emerald-400 font-bold">GOOGLE SHEETS LIVE SYNC</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block"></span>
+                    </div>
+                    <h4 class="text-sm font-bold text-white mt-0.5">User Details, Packages & Balances Auto-Synchronized</h4>
+                    <p class="text-[11px] text-slate-400">Every payment verification streams directly to your Google Sheet.</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                  <button onclick="triggerGoogleSheetSync()" id="btnGsheetQuickSync" class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase bg-emerald-500 hover:bg-emerald-400 text-black flex items-center gap-2 transition-all shadow">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Sync All Now</span>
+                  </button>
+                  <button onclick="setAdminDashTab('gsheet')" class="px-3.5 py-2.5 rounded-xl text-xs font-semibold glass hover:border-white/14 text-slate-200 transition-all">
+                    Settings
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: USERS -->
+            <div id="aTab-users" class="hidden space-y-4 fade-in">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-base font-bold text-white">Registered Studio Clients</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Manage package hours, balances, and sync to Google Sheets.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <input type="text" id="adminUserSearchInput" oninput="filterAdminUsers(this.value)" placeholder="Search clients..." class="input-dark w-44 text-[11px] py-2">
+                  <button onclick="triggerGoogleSheetSync()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/25 flex items-center gap-1.5 transition-all"><svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Sync Sheet</span></button>
+                  <button onclick="exportUsersToCsv()" class="px-3.5 py-2 rounded-xl text-xs font-semibold glass hover:border-white/14 text-slate-300 flex items-center gap-1.5 transition-all"> CSV</button>
+                </div>
+              </div>
+              <div class="overflow-x-auto rounded-2xl card-3d border-0">
+                <table class="data-table">
+                  <thead><tr><th>Client</th><th>Phone</th><th>Package</th><th>Hours Left</th><th>Balance Due</th><th class="text-right">Actions</th></tr></thead>
+                  <tbody id="adminUsersTableBody" class="divide-y divide-white/4"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: PACKAGES -->
+            <div id="aTab-packages" class="hidden space-y-4 fade-in">
+              <div class="card-gold-3d rounded-2xl p-6 max-w-md">
+                <h3 class="text-base font-bold text-white mb-1">Adjust Customer Hours</h3>
+                <p class="text-xs text-slate-400 mb-4">Add or remove hours from a client's package.</p>
+                <form onsubmit="handleAdminAdjustHours(event)" class="space-y-3 text-xs">
+                  <div>
+                    <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Select Client</label>
+                    <select id="adminAdjustUserSelect" class="input-dark"><option value="dr.rajesh@gmail.com">Dr. Rajesh Sharma</option></select>
+                  </div>
+                  <div>
+                    <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Hours Adjustment (+2 or -2)</label>
+                    <input type="number" id="adminAdjustHoursVal" placeholder="+2 or -2" required class="input-dark">
+                  </div>
+                  <button type="submit" class="px-5 py-2.5 rounded-xl gold-gradient-bg text-black font-bold text-xs uppercase hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all">Apply Adjustment</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: BOOKINGS -->
+            <div id="aTab-bookings" class="hidden space-y-4 fade-in">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-base font-bold text-white">Studio Schedule & Zoom Links</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">View sessions, edit Zoom links, or complete bookings.</p>
+                </div>
+                <input type="text" id="adminBookingSearchInput" oninput="filterAdminBookings(this.value)" placeholder="Search sessions..." class="input-dark w-52 text-[11px] py-2">
+              </div>
+              <div class="overflow-x-auto rounded-2xl card-3d border-0">
+                <table class="data-table">
+                  <thead><tr><th>Date & Time</th><th>Client</th><th>Setup</th><th>Zoom Link</th><th>Duration</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+                  <tbody id="adminBookingsTableBody" class="divide-y divide-white/4"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: PAYMENTS -->
+            <div id="aTab-payments" class="hidden space-y-6 fade-in">
+              <div class="card-gold-3d rounded-2xl p-6 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <h3 class="text-sm font-bold text-white">Pending Slip Approvals</h3>
+                  <span class="text-[11px] text-slate-400">Review transfer receipts and verify or reject</span>
+                </div>
+                <div id="adminPendingSlipsList" class="space-y-2"></div>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white mb-3">All Payments Ledger</h3>
+                <div class="overflow-x-auto rounded-2xl card-3d border-0">
+                  <table class="data-table">
+                    <thead><tr><th>Date</th><th>Customer</th><th>Reference #</th><th>Method</th><th>Amount</th><th class="text-right">Status</th></tr></thead>
+                    <tbody id="adminAllPaymentsTableBody" class="divide-y divide-white/4"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: REVIEWS -->
+            <div id="aTab-reviews" class="hidden fade-in">
+              <h3 class="text-base font-bold text-white mb-4">Client Reviews</h3>
+              <div class="overflow-x-auto rounded-2xl card-3d border-0">
+                <table class="data-table"><tbody id="adminReviewsTableBody" class="divide-y divide-white/4"></tbody></table>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: SETTINGS -->
+            <div id="aTab-settings" class="hidden space-y-6 fade-in">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                <!-- Bank Settings -->
+                <div class="card-3d rounded-2xl p-6 space-y-3 text-xs">
+                  <span class="text-[10px] font-mono text-[#D4AF37] uppercase">Financial Settings</span>
+                  <h3 class="text-base font-bold text-white">Studio Bank Account</h3>
+                  <p class="text-slate-400 text-[11px]">Displayed to clients across public and portal pages.</p>
+                  <form onsubmit="handleUpdateStudioBank(event)" class="space-y-3 mt-2">
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Account Holder</label><input type="text" id="adminBankNameAcc" required class="input-dark"></div>
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Bank Name</label><input type="text" id="adminBankName" required class="input-dark"></div>
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Branch</label><input type="text" id="adminBranch" required class="input-dark"></div>
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Account Number</label><input type="text" id="adminAccNum" required class="input-dark font-mono"></div>
+                    <div class="flex items-center gap-3">
+                      <button type="submit" class="px-4 py-2.5 rounded-xl gold-gradient-bg text-black font-bold text-xs uppercase">Save</button>
+                      <span id="adminBankSavedMsg" class="hidden text-xs text-emerald-400 font-semibold">✓ Saved</span>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Zoom Settings -->
+                <div class="card-3d rounded-2xl p-6 space-y-3 text-xs border-blue-500/15">
+                  <span class="text-[10px] font-mono text-blue-400 uppercase">Broadcast Settings</span>
+                  <h3 class="text-base font-bold text-white">Default Zoom Link</h3>
+                  <p class="text-slate-400 text-[11px]">Updates the universal Zoom meeting URL for all bookings.</p>
+                  <form onsubmit="handleAdminUpdateDefaultZoom(event)" class="space-y-3 mt-2">
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Zoom Meeting URL</label><input type="url" id="adminDefZoomUrl" value="https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026" required class="input-dark font-mono text-[11px]"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                      <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Meeting ID</label><input type="text" id="adminDefZoomId" value="845 2319 4022" required class="input-dark font-mono"></div>
+                      <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Passcode</label><input type="text" id="adminDefZoomPass" value="THINK2026" required class="input-dark font-mono"></div>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase shadow transition-all">Update All Sessions</button>
+                    <span id="adminZoomSavedMsg" class="hidden text-xs text-emerald-400 block text-center font-semibold">✓ Zoom link updated!</span>
+                  </form>
+                </div>
+
+                <!-- Google Sheet Settings (wide) -->
+                <div class="card-3d rounded-2xl p-6 space-y-3 text-xs md:col-span-2 border-emerald-500/15">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] font-mono text-emerald-400 uppercase font-bold">Automation & Cloud</span>
+                      <h3 class="text-base font-bold text-white mt-0.5">Google Sheets Webhook</h3>
+                    </div>
+                    <span class="badge-green text-[10px] flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>CONNECTED</span>
+                  </div>
+                  <form onsubmit="handleSaveGsheetWebhook(event)" class="space-y-3 mt-1">
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Webhook Exec URL</label><input type="url" id="adminSettingsGsheetUrl" value="https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec" required class="input-dark font-mono text-[11px]"></div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs uppercase transition-all">Save Webhook</button>
+                      <button type="button" onclick="triggerGoogleSheetSync()" class="px-3.5 py-2 rounded-xl glass text-slate-200 text-xs font-semibold transition-all">Sync All</button>
+                      <button type="button" onclick="testGsheetWebhook()" class="px-3 py-2 rounded-xl glass text-slate-300 text-xs transition-all">Test</button>
+                      <span id="adminSettingsGsheetSavedMsg" class="hidden text-xs text-emerald-400 font-semibold">✓ Saved</span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADMIN TAB: GOOGLE SHEETS -->
+            <div id="aTab-gsheet" class="hidden space-y-6 fade-in">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main webhook card -->
+                <div class="lg:col-span-2 card-3d rounded-2xl p-6 space-y-4 text-xs border-emerald-500/15">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] font-mono text-emerald-400 uppercase font-bold">Real-Time Data Stream</span>
+                      <h3 class="text-lg font-bold text-white mt-1">Google Sheet Webhook & Dashboard</h3>
+                    </div>
+                    <span class="badge-green text-[10px] flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>CONNECTED</span>
+                  </div>
+                  <p class="text-slate-300">Your Google Apps Script Web App is connected directly to Think Studio's SQLite database. Every payment verification streams to your Sheet with an automated Side Monthly Payments & Financial Ledger.</p>
+                  <form onsubmit="handleSaveGsheetWebhook(event)" class="space-y-3 pt-1">
+                    <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Google Apps Script Web App URL</label>
+                      <div class="flex gap-2">
+                        <input type="url" id="adminGsheetWebhookUrl" required value="https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec" class="input-dark font-mono text-[11px] flex-1">
+                        <button type="button" onclick="copyToClipboard(document.getElementById('adminGsheetWebhookUrl').value)" class="px-3 py-2 rounded-xl glass text-slate-300 text-xs whitespace-nowrap">Copy URL</button>
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <button type="submit" class="px-5 py-2.5 rounded-xl font-bold uppercase text-xs bg-emerald-500 hover:bg-emerald-400 text-black transition-all">Save Webhook</button>
+                      <button type="button" onclick="testGsheetWebhook()" class="px-4 py-2.5 rounded-xl text-xs font-semibold glass text-slate-200 transition-all">Test Payload</button>
+                      <button type="button" onclick="copyGoogleAppsScriptCode()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#D4AF37] border border-[#D4AF37]/30 transition-all"> Copy Code.gs</button>
+                      <span id="gsheetSavedMsg" class="hidden text-xs text-emerald-400 font-semibold self-center">✓ Saved</span>
+                    </div>
+                  </form>
+                  <!-- Sheet layout preview -->
+                  <div class="pt-3 border-t border-white/5 space-y-2">
+                    <span class="text-[10px] font-mono text-[#D4AF37] uppercase font-bold">Spreadsheet Dual-Layout Structure</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+                      <div class="p-3 rounded-xl bg-black/40 border border-white/6 space-y-2">
+                        <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span class="font-bold text-white text-[10px]">LEFT: Member Directory (Cols A—M)</span></div>
+                        <p class="text-slate-400 text-[10px]">Smart in-place updating. Syncs name, packages, hours, fees, and balances.</p>
+                        <div class="flex flex-wrap gap-1 text-[9px] font-mono text-slate-300">
+                          <span class="px-1.5 py-0.5 rounded bg-white/5">Timestamp</span><span class="px-1.5 py-0.5 rounded bg-white/5">Client ID</span><span class="px-1.5 py-0.5 rounded bg-white/5 text-[#D4AF37]">Package</span><span class="px-1.5 py-0.5 rounded bg-white/5 text-emerald-400">Fee & Paid</span><span class="px-1.5 py-0.5 rounded bg-white/5 text-amber-400">Balance</span><span class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-400">Hours</span>
+                        </div>
+                      </div>
+                      <div class="p-3 rounded-xl bg-black/40 border border-[#D4AF37]/20 space-y-2">
+                        <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span><span class="font-bold text-[#D4AF37] text-[10px]">RIGHT: Financial Dashboard (Cols O—T)</span></div>
+                        <p class="text-slate-400 text-[10px]">Auto-calculating KPI cards and monthly collection breakdowns.</p>
+                        <div class="space-y-0.5 text-[10px]">
+                          <div class="flex justify-between py-0.5 border-b border-white/4"><span class="text-slate-300">1. KPI Cards:</span><span class="font-mono text-white">Revenue • Paid • Due</span></div>
+                          <div class="flex justify-between py-0.5 border-b border-white/4"><span class="text-slate-300">2. Monthly Breakdown:</span><span class="font-mono text-[#D4AF37]">Billed • Collected • %</span></div>
+                          <div class="flex justify-between py-0.5 border-b border-white/4"><span class="text-slate-300">3. Bank Deposits:</span><span class="font-mono text-emerald-400">Auto-logged</span></div>
+                          <div class="flex justify-between py-0.5"><span class="text-slate-300">4. Package Breakdown:</span><span class="font-mono text-cyan-400">Monthly • Flex • Single</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Panel -->
+                <div class="card-3d rounded-2xl p-6 space-y-4 text-xs">
+                  <div>
+                    <span class="text-[10px] font-mono text-[#D4AF37] uppercase">Sync & Setup</span>
+                    <h3 class="text-base font-bold text-white mt-1">Actions & Backup</h3>
+                  </div>
+                  <div class="space-y-2">
+                    <button onclick="triggerGoogleSheetSync()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold uppercase text-xs flex items-center justify-center gap-2 shadow transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Sync All Users</span></button>
+                    <button onclick="loadSampleDataToSheet()" class="w-full py-2.5 rounded-xl bg-blue-600/25 hover:bg-blue-600/40 text-blue-300 font-bold text-xs border border-blue-500/30 flex items-center justify-center gap-2 transition-all"> Load Sample Data</button>
+                    <button onclick="alert('Open Google Sheet → Think Studio menu → Clear Sample Data')" class="w-full py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs border border-rose-500/25 flex items-center justify-center gap-2 transition-all"> Clear Sample Data</button>
+                    <button onclick="copyGoogleAppsScriptCode()" class="w-full py-2.5 rounded-xl bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] font-bold text-xs border border-[#D4AF37]/25 flex items-center justify-center gap-2 transition-all"> Copy Code.gs</button>
+                    <button onclick="exportUsersToCsv()" class="w-full py-2.5 rounded-xl glass hover:border-white/14 text-white text-xs flex items-center justify-center gap-2 transition-all"> Export CSV</button>
+                  </div>
+                  <!-- Setup Guide in Sinhala -->
+                  <div class="p-3.5 rounded-xl bg-black/40 border border-white/6 text-[11px] text-slate-300 space-y-2">
+                    <div class="font-bold text-[#D4AF37] flex items-center gap-2 text-xs">
+                    <svg class="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>Google Sheet Setup ආකාරය (5 පියවර):</span>
+                  </div>
+                  <ol class="list-decimal list-inside space-y-1.5 text-[11px] text-slate-300 leading-relaxed pt-1">
+                    <li>ඔබගේ Google Spreadsheet එක open කරන්න.</li>
+                    <li>Menu තීරුවෙන් <b class="text-white">Extensions &gt; Apps Script</b> වෙත යන්න.</li>
+                    <li>එහි ඇති code සියල්ල delete කර ඉහත <b class="text-[#D4AF37]">"Copy Code.gs"</b> button එකෙන් copy කරගත් script එක paste කරන්න.</li>
+                    <li><b>Save</b> කර <b>Deploy &gt; New Deployment &gt; Web App</b> ලෙස තෝරා Deploy කරන්න.</li>
+                    <li>Spreadsheet එක refresh කළ විට ඉහළින් ලැබෙන <b class="text-white">Think Studio</b> menu එකෙන් <b class="text-[#D4AF37]">Setup Dashboard</b> click කරන්න!</li>
+                  </ol>
+                </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== BOOKING MODAL ==================== -->
+  <div id="bookingModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="card-gold-3d rounded-3xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl fade-in max-h-[90vh] overflow-y-auto">
+      <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">✕</button>
+      <span class="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest block mb-1">Studio Reservation</span>
+      <h3 class="text-2xl font-black text-white" id="modalBookingTitle">Book Studio Slot</h3>
+      <p class="text-xs text-slate-400 mt-1 mb-6">Reserve your recording or Zoom online teaching session.</p>
+      <form onsubmit="handleConfirmBooking(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Session Purpose / Topic *</label>
+          <input type="text" id="bkgTopic" required placeholder="e.g. Advanced Calculus Lecture 4" class="input-dark">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Date *</label>
+            <input type="date" id="bkgDate" required class="input-dark">
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Time Slot *</label>
+            <select id="bkgSlot" class="input-dark">
+              <option>10:00 AM — 12:00 PM</option>
+              <option>02:00 PM — 04:00 PM</option>
+              <option>04:00 PM — 06:00 PM</option>
+              <option>06:00 PM — 08:00 PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Duration *</label>
+            <select id="bkgDuration" class="input-dark">
+              <option value="2">2 Hours (−2h)</option>
+              <option value="3">3 Hours (−3h)</option>
+              <option value="4">4 Hours (−4h)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Primary Gear</label>
+            <select id="bkgGear" onchange="handleGearChange(this.value)" class="input-dark">
+              <option value="75&quot; Smart Board + Zoom Rig">75" Smart Board + Zoom Rig</option>
+              <option value="Sony 4K Cinema YouTube Rig">Sony 4K Cinema YouTube Rig</option>
+              <option value="Vertical 9:16 Reels Setup">Vertical 9:16 Reels Setup</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Zoom Teaching Link</label>
+          <div class="flex gap-2">
+            <input type="url" id="bkgZoomLink" value="https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026" placeholder="https://zoom.us/j/..." class="input-dark flex-1 font-mono text-[11px]">
+            <button type="button" onclick="autoGenerateZoomLink()" class="px-3 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/35 text-blue-400 border border-blue-500/30 font-semibold text-[11px] whitespace-nowrap transition-all">Auto Generate</button>
+          </div>
+          <span class="text-[10px] text-slate-500 mt-1 block">Students join this link during your live session.</span>
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider text-black gold-gradient-bg shadow-lg hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all relative overflow-hidden shimmer-effect mt-2">Confirm Reservation</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN EDIT ZOOM MODAL ==================== -->
+  <div id="adminZoomModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="card-3d border-blue-500/35 rounded-3xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl fade-in text-xs">
+      <button onclick="closeAdminZoomModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">✕</button>
+      <span class="text-[10px] font-mono text-blue-400 uppercase tracking-widest block mb-1">Studio Zoom Controls</span>
+      <h3 class="text-xl font-black text-white mt-1">Assign / Edit Zoom Link</h3>
+      <p class="text-slate-400 text-xs mt-1 mb-6" id="adminZoomBookingInfo">Setting Zoom link for session</p>
+      <form onsubmit="handleSaveAdminZoom(event)" class="space-y-4">
+        <input type="hidden" id="adminZoomBookingId">
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Zoom Meeting Join URL *</label><input type="url" id="adminZoomUrl" required class="input-dark font-mono text-[11px]"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Meeting ID</label><input type="text" id="adminZoomId" required class="input-dark font-mono"></div>
+          <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Passcode</label><input type="text" id="adminZoomPass" required class="input-dark font-mono"></div>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl text-xs font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 transition-all">Save & Update Customer Portal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== AUTH MODAL ==================== -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="card-gold-3d rounded-3xl max-w-md w-full p-6 relative fade-in">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">✕</button>
+      <div class="flex items-center gap-2 mb-5">
+        <div class="w-8 h-8 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/25 flex items-center justify-center text-xs font-black text-[#D4AF37]">TS</div>
+        <span class="text-base font-black text-white">Think <span class="text-[#D4AF37]">Studio</span></span>
+      </div>
+      <div class="flex gap-1 p-1 rounded-xl bg-white/4 border border-white/6 mb-5">
+        <button onclick="switchAuthTab('login')" id="authTabLogin" class="flex-1 py-2 rounded-lg text-sm font-bold text-black bg-[#D4AF37] transition-all">Login</button>
+        <button onclick="switchAuthTab('register')" id="authTabRegister" class="flex-1 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all">Register</button>
+      </div>
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3 text-xs">
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Email Address</label><input type="email" id="loginEmail" required placeholder="dr.rajesh@gmail.com" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Password</label><input type="password" id="loginPass" required value="password123" class="input-dark"></div>
+        <p class="text-[10px] text-slate-500 font-mono">Customer: dr.rajesh@gmail.com | Admin: thinkstudiocontact@gmail.com</p>
+        <button type="submit" class="w-full py-3 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Sign In</button>
+      </form>
+      <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="hidden space-y-3 text-xs">
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Full Name</label><input type="text" id="regName" required placeholder="Full Name" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Phone</label><input type="tel" id="regPhone" required placeholder="Phone" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Email</label><input type="email" id="regEmail" required placeholder="Email" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Password</label><input type="password" id="regPass" required placeholder="Password" class="input-dark"></div>
+        <button type="submit" class="w-full py-3 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== REVIEW MODAL ==================== -->
+  <div id="reviewModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="card-gold-3d rounded-3xl max-w-md w-full p-6 relative fade-in text-xs">
+      <button onclick="closeReviewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">✕</button>
+      <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span>Write a Review</span></h3>
+      <form onsubmit="handleSubmitReview(event)" class="space-y-3">
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Your Name</label><input type="text" id="revAuthor" required placeholder="Your Name" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Role / Title</label><input type="text" id="revRole" required placeholder="e.g. Physics Lecturer" class="input-dark"></div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Rating</label>
+          <select id="revRating" class="input-dark text-amber-400">
+            <option value="5">★★★★★ (5 — Excellent)</option>
+            <option value="4">★★★★☆ (4 — Very Good)</option>
+            <option value="3">★★★☆☆ (3 — Good)</option>
+          </select>
+        </div>
+        <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Your Review</label><textarea id="revComment" rows="3" required placeholder="Share your studio experience..." class="input-dark resize-none"></textarea></div>
+        <button type="submit" class="w-full py-3 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Post Review</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== FLOATING WHATSAPP ==================== -->
+  <aside class="fixed bottom-6 right-6 z-40">
+    <a href="https://wa.me/94702663137?text=Hello%20Think%20Studio!%20I%20would%20like%20to%20inquire%20about%20booking%20the%20studio."
+       target="_blank" rel="noopener noreferrer"
+       class="group flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#25D366] hover:bg-[#20BA5A] text-white shadow-xl shadow-[#25D366]/30 hover:shadow-[#25D366]/50 transition-all transform hover:-translate-y-1 active:scale-95 border-2 border-white/15">
+      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 17.76c-1.49 0-2.94-.4-4.22-1.16l-.3-.18-3.13.82.84-3.05-.2-.31c-.84-1.34-1.28-2.9-1.28-4.5 0-4.63 3.77-8.4 8.4-8.4 2.25 0 4.36.88 5.95 2.47 1.59 1.59 2.46 3.7 2.46 5.94 0 4.63-3.77 8.4-8.4 8.4zm4.6-6.28c-.25-.13-1.49-.74-1.72-.82-.23-.08-.4-.13-.57.13-.17.25-.66.82-.81.99-.15.17-.3.19-.55.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.87-.21-.5-.42-.43-.57-.44l-.49-.01c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.42 1.44.54.61.19 1.16.17 1.6.1 1.16-.07 1.49-.61 1.7-1.19.21-.58.21-1.08.15-1.19-.06-.11-.23-.17-.48-.3z"/></svg>
+      <div class="hidden sm:block text-left">
+        <span class="block text-[10px] uppercase font-mono text-emerald-100 leading-none">WhatsApp</span>
+        <span class="block text-xs font-bold font-mono leading-tight">0702663137</span>
+      </div>
+      <span class="relative flex h-3 w-3 -ml-1">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+      </span>
+    </a>
+  </aside>
+
+  <!-- ==================== JAVASCRIPT STATE ENGINE ==================== -->
+  <script>
+    const DEFAULT_DATA = {
+      currentUser: null,
+      studioBank: { accountName: "E.M.S.S. Fonseka", bankName: "People's Bank", branch: "Godakawela Branch", accountNumber: "245200290056879" },
+      users: [
+        { id: "u-1", name: "Dr. Rajesh Sharma", email: "dr.rajesh@gmail.com", phone: "+94 77 123 4567", role: "customer", org: "Apex Physics Academy",
+          package: { name: "Monthly Package", cost: 12000, totalHours: 20, usedHours: 8, remainingHours: 12, startDate: "2026-09-15", endDate: "2026-10-15" },
+          payments: [{ id: "P-101", date: "2026-09-15", ref: "CB-773921", method: "Bank Transfer", amount: 8000, status: "Verified" }],
+          balanceDue: 4000
+        },
+        { id: "admin-1", name: "Studio Manager", email: "thinkstudiocontact@gmail.com", phone: "0702663137", role: "admin" }
+      ],
+      bookings: [
+        { 
+          id: "B-201", 
+          userEmail: "dr.rajesh@gmail.com", 
+          userName: "Dr. Rajesh Sharma", 
+          date: "2026-09-29", 
+          time: "10:00 AM — 12:00 PM", 
+          duration: 2, 
+          topic: "Electromagnetism Live Batch", 
+          gear: "75\" Smart Board + Zoom Rig",
+          zoomLink: "https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026",
+          meetingId: "845 2319 4022",
+          passcode: "THINK2026",
+          status: "Confirmed" 
+        },
+        { 
+          id: "B-202", 
+          userEmail: "dr.rajesh@gmail.com", 
+          userName: "Dr. Rajesh Sharma", 
+          date: "2026-09-25", 
+          time: "02:00 PM — 05:00 PM", 
+          duration: 3, 
+          topic: "Wave Optics Masterclass Module 1", 
+          gear: "75\" Smart Board", 
+          zoomLink: "https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026",
+          meetingId: "845 2319 4022",
+          passcode: "THINK2026",
+          status: "Completed" 
+        }
+      ],
+      deductions: [
+        { date: "2026-09-25", topic: "Wave Optics Masterclass Module 1", hours: 3, tech: "Kamalan", status: "Completed" },
+        { date: "2026-09-21", topic: "Problem Solving Batch #2", hours: 3, tech: "Pradeep", status: "Completed" }
+      ],
+      reviews: [
+        { id: "r-1", author: "Dr. Rajesh Sharma", role: "Physics Lecturer & Author", rating: 5, comment: "The 75-inch smart board with integrated Zoom allows me to see my students on the confidence monitors while writing equations smoothly. Sound acoustics are 10/10.", featured: true, status: "Approved" }
+      ],
+      pendingSlips: [
+        { id: "SLIP-901", userEmail: "dr.rajesh@gmail.com", userName: "Dr. Rajesh Sharma", amount: 4000, ref: "CB-8942188", date: "2026-09-28", status: "Pending Verification" }
+      ],
+      googleSheetWebhook: "https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec"
+    };
+
+    function loadState() {
+      const stored = localStorage.getItem('THINK_STUDIO_STATE');
+      if (!stored) {
+        localStorage.setItem('THINK_STUDIO_STATE', JSON.stringify(DEFAULT_DATA));
+        return DEFAULT_DATA;
+      }
+      const data = JSON.parse(stored);
+      // Synchronize official studio bank account details
+      data.studioBank = {
+        accountName: "E.M.S.S. Fonseka",
+        bankName: "People's Bank",
+        branch: "Godakawela Branch",
+        accountNumber: "245200290056879"
+      };
+      // Synchronize official studio contact & admin details
+      const admin = data.users.find(u => u.role === 'admin');
+      if (admin) {
+        admin.email = "thinkstudiocontact@gmail.com";
+        admin.phone = "0702663137";
+      }
+      // Ensure zoom links are properly seeded on existing sessions
+      if (data.bookings && data.bookings[0] && !data.bookings[0].zoomLink) {
+        data.bookings[0].zoomLink = "https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026";
+        data.bookings[0].meetingId = "845 2319 4022";
+        data.bookings[0].passcode = "THINK2026";
+      }
+      data.googleSheetWebhook = data.googleSheetWebhook || "https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec";
+      localStorage.setItem('THINK_STUDIO_STATE', JSON.stringify(data));
+      return data;
+    }
+
+    function saveState(s) { localStorage.setItem('THINK_STUDIO_STATE', JSON.stringify(s)); }
+    let state = loadState();
+
+    async function syncWithDatabase() {
+      try {
+        const res = await fetch('/api/state');
+        if (res.ok) {
+          const dbData = await res.json();
+          if (dbData.users && dbData.users.length) state.users = dbData.users;
+          if (dbData.bookings) state.bookings = dbData.bookings;
+          if (dbData.pendingSlips) state.pendingSlips = dbData.pendingSlips;
+          if (dbData.reviews) state.reviews = dbData.reviews;
+          if (dbData.studioBank) state.studioBank = dbData.studioBank;
+          if (dbData.googleSheetWebhook) {
+            state.googleSheetWebhook = dbData.googleSheetWebhook;
+            const w1 = document.getElementById('adminGsheetWebhookUrl');
+            if (w1) w1.value = dbData.googleSheetWebhook;
+            const w2 = document.getElementById('adminSettingsGsheetUrl');
+            if (w2) w2.value = dbData.googleSheetWebhook;
+          }
+          
+          if (state.currentUser) {
+            state.currentUser = state.users.find(u => u.email === state.currentUser.email) || state.currentUser;
+          }
+          saveState(state);
+          renderApp();
+          setDbStatus(true, dbData.databaseType);
+        }
+      } catch (err) {
+        console.log("Using local offline store", err);
+        setDbStatus(false);
+      }
+    }
+
+    function setDbStatus(online, dbName = "SQLite3 (think_studio.db)") {
+      const badge = document.getElementById('dbStatusBadge');
+      if (badge) {
+        if (online) {
+          badge.className = "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px]";
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>DB: ${dbName}</span>`;
+        } else {
+          badge.className = "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px]";
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>Storage: Local Storage</span>`;
+        }
+      }
+    }
+
+    function showDbToast(msg) {
+      let toast = document.getElementById('dbToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'dbToast';
+        toast.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-[999] px-5 py-3 rounded-2xl glass-gold text-white text-xs font-semibold shadow-2xl flex items-center gap-2.5';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>${msg}</span>`;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApp();
+      syncWithDatabase();
+      const bkg = document.getElementById('bkgDate');
+      if (bkg) {
+        const d = new Date(); d.setDate(d.getDate() + 1);
+        bkg.value = d.toISOString().split('T')[0];
+      }
+    });
+
+    function renderApp() {
+      const user = state.currentUser;
+      const roleBadge = document.getElementById('currentRoleBadge');
+      const guestAuthGroup = document.getElementById('guestAuthGroup');
+      const userAuthGroup = document.getElementById('userAuthGroup');
+      const topLogoutBtn = document.getElementById('topLogoutBtn');
+
+      if (!user) {
+        roleBadge.textContent = "Guest Mode";
+        guestAuthGroup.classList.remove('hidden');
+        userAuthGroup.classList.add('hidden');
+        if (topLogoutBtn) topLogoutBtn.classList.add('hidden');
+      } else {
+        const isCustomer = user.role === 'customer';
+        roleBadge.textContent = isCustomer ? `Customer: ${user.name}` : `Admin: ${user.name}`;
+        guestAuthGroup.classList.add('hidden');
+        userAuthGroup.classList.remove('hidden');
+        if (topLogoutBtn) topLogoutBtn.classList.remove('hidden');
+        document.getElementById('navUserName').textContent = user.name.split(' ')[0];
+        document.getElementById('navUserAvatar').textContent = user.name.charAt(0);
+        document.getElementById('navRoleTag').textContent = isCustomer ? 'Portal' : 'Admin';
+      }
+
+      document.getElementById('dispAccountName').textContent = state.studioBank.accountName;
+      document.getElementById('dispBankName').textContent = state.studioBank.bankName;
+      document.getElementById('dispBranch').textContent = state.studioBank.branch;
+      document.getElementById('dispAccountNum').textContent = state.studioBank.accountNumber;
+
+      renderPublicReviews();
+      if (user && user.role === 'customer') renderCustomerDashboard();
+      else if (user && user.role === 'admin') renderAdminDashboard();
+    }
+
+    function navigateTo(target, section = null) {
+      document.getElementById('viewPublic').classList.add('hidden');
+      document.getElementById('viewUserDashboard').classList.add('hidden');
+      document.getElementById('viewAdminDashboard').classList.add('hidden');
+      if (target === 'public') {
+        document.getElementById('viewPublic').classList.remove('hidden');
+        if (section) {
+          const el = document.getElementById(section);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (target === 'user') {
+        document.getElementById('viewUserDashboard').classList.remove('hidden');
+        renderCustomerDashboard();
+      } else if (target === 'admin') {
+        document.getElementById('viewAdminDashboard').classList.remove('hidden');
+        renderAdminDashboard();
+      }
+    }
+
+    function navigateToDashboard() {
+      if (!state.currentUser) openAuthModal('login');
+      else if (state.currentUser.role === 'admin') navigateTo('admin');
+      else navigateTo('user');
+    }
+
+    function handleHeaderBookClick() {
+      if (!state.currentUser) openBookingModal('Studio Booking');
+      else { navigateTo('user'); openBookingModal('Book with Package Hours'); }
+    }
+
+    function quickLogin(role) {
+      if (role === 'customer') {
+        state.currentUser = state.users.find(u => u.email === 'dr.rajesh@gmail.com');
+        saveState(state); renderApp(); navigateTo('user');
+      } else {
+        state.currentUser = state.users.find(u => u.role === 'admin');
+        saveState(state); renderApp(); navigateTo('admin');
+      }
+      closeAuthModal();
+    }
+
+    function handleLogout() {
+      state.currentUser = null; saveState(state); renderApp(); navigateTo('public');
+    }
+
+    function openAuthModal(t = 'login') {
+      document.getElementById('authModal').classList.remove('hidden');
+      switchAuthTab(t);
+    }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+    function switchAuthTab(t) {
+      if (t === 'login') {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('authTabLogin').className = 'flex-1 py-2 rounded-lg text-sm font-bold text-black bg-[#D4AF37] transition-all';
+        document.getElementById('authTabRegister').className = 'flex-1 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all';
+      } else {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('authTabRegister').className = 'flex-1 py-2 rounded-lg text-sm font-bold text-black bg-[#D4AF37] transition-all';
+        document.getElementById('authTabLogin').className = 'flex-1 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all';
+      }
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      let found = state.users.find(u => u.email.toLowerCase() === email);
+      if (!found && (email === 'admin@thinkstudio.com' || email === 'thinkstudiocontact@gmail.com' || email.includes('admin'))) {
+        found = state.users.find(u => u.role === 'admin');
+      }
+      if (found) {
+        state.currentUser = found; saveState(state); renderApp(); closeAuthModal();
+        if (found.role === 'admin') navigateTo('admin'); else navigateTo('user');
+      } else alert("User not found. Use Demo button or dr.rajesh@gmail.com / thinkstudiocontact@gmail.com");
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const user = {
+        id: "u-" + Date.now(), name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
+        phone: document.getElementById('regPhone').value, role: "customer",
+        package: { name: "Monthly Package", cost: 12000, totalHours: 20, usedHours: 0, remainingHours: 20, startDate: "2026-09-28", endDate: "2026-10-28" },
+        payments: [], balanceDue: 12000
+      };
+      state.users.push(user); state.currentUser = user; saveState(state); renderApp(); closeAuthModal(); navigateTo('user');
+      syncUserToGoogleSheet(user);
+      fetch('/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user)
+      }).catch(err => console.warn("DB offline", err));
+      showDbToast("✓ Account created & synced to Google Sheet!");
+    }
+
+    // Customer Dashboard Rendering
+    function renderCustomerDashboard() {
+      const user = state.currentUser;
+      if (!user || user.role !== 'customer') return;
+
+      const pkg = user.package || {
+        name: 'Standard Package',
+        cost: 0,
+        totalHours: 0,
+        usedHours: 0,
+        remainingHours: 0,
+        startDate: '—',
+        endDate: '—'
+      };
+      const bal = (user.balanceDue !== undefined && user.balanceDue !== null ? user.balanceDue : 0);
+
+      const nameEl = document.getElementById('userDashName'); if (nameEl) nameEl.textContent = user.name || 'User';
+      const remEl = document.getElementById('statRemainingHours'); if (remEl) remEl.textContent = pkg.remainingHours !== undefined ? pkg.remainingHours : 0;
+      const totEl = document.getElementById('statTotalHours'); if (totEl) totEl.textContent = pkg.totalHours !== undefined ? pkg.totalHours : 0;
+      const pkgNameEl = document.getElementById('statPackageName'); if (pkgNameEl) pkgNameEl.textContent = pkg.name || 'Standard Package';
+      const outBalEl = document.getElementById('statOutstandingBalance'); if (outBalEl) outBalEl.textContent = `Rs. ${bal.toLocaleString()}`;
+
+      // Find next upcoming confirmed Zoom session
+      const userBookings = (state.bookings || []).filter(b => b.userEmail === user.email);
+      const nextZoomBooking = userBookings.find(b => b.status === 'Confirmed' && b.zoomLink) || userBookings.find(b => b.zoomLink);
+
+      const topicEl = document.getElementById('dashNextZoomTopic');
+      const urlEl = document.getElementById('dashZoomUrlLink');
+      const idEl = document.getElementById('dashZoomIdText');
+      const passEl = document.getElementById('dashZoomPassText');
+
+      if (nextZoomBooking && nextZoomBooking.zoomLink) {
+        if (topicEl) topicEl.textContent = `${nextZoomBooking.date} (${nextZoomBooking.time}): ${nextZoomBooking.topic}`;
+        if (urlEl) urlEl.textContent = nextZoomBooking.zoomLink;
+        if (idEl) idEl.textContent = nextZoomBooking.meetingId || "845 2319 4022";
+        if (passEl) passEl.textContent = nextZoomBooking.passcode || "THINK2026";
+      } else if (userBookings.length > 0) {
+        const latest = userBookings[0];
+        if (topicEl) topicEl.textContent = `${latest.date} (${latest.time}): ${latest.topic}`;
+        if (urlEl) urlEl.textContent = "— In-Studio Recording Session —";
+        if (idEl) idEl.textContent = "N/A";
+        if (passEl) passEl.textContent = "N/A";
+      } else {
+        if (topicEl) topicEl.textContent = "No studio sessions scheduled yet";
+        if (urlEl) urlEl.textContent = "Book a slot to generate your live Zoom room";
+        if (idEl) idEl.textContent = "—";
+        if (passEl) passEl.textContent = "—";
+      }
+
+      // Package Details
+      const pTitle = document.getElementById('pkgDetailTitle'); if (pTitle) pTitle.textContent = pkg.name;
+      const pPrice = document.getElementById('pkgDetailPrice'); if (pPrice) pPrice.textContent = `Rs. ${(pkg.cost || 0).toLocaleString()}`;
+      const pTot = document.getElementById('pkgDetailTotalHours'); if (pTot) pTot.textContent = `${pkg.totalHours || 0} Hours`;
+      const pUsed = document.getElementById('pkgDetailUsedHours'); if (pUsed) pUsed.textContent = `${pkg.usedHours || 0} Hours`;
+      const pRem = document.getElementById('pkgDetailRemainHours'); if (pRem) pRem.textContent = `${pkg.remainingHours || 0} Hours`;
+      const pStart = document.getElementById('pkgDetailStartDate'); if (pStart) pStart.textContent = pkg.startDate || '—';
+      const pEnd = document.getElementById('pkgDetailEndDate'); if (pEnd) pEnd.textContent = pkg.endDate || '—';
+
+      // Hours progress
+      const totalH = pkg.totalHours || 0;
+      const remH = pkg.remainingHours || 0;
+      const pct = totalH > 0 ? Math.min(100, Math.max(0, (remH / totalH) * 100)) : 0;
+      const progressEl = document.getElementById('hoursProgressPercent');
+      if (progressEl) progressEl.style.width = pct + '%';
+      const usedTextEl = document.getElementById('statUsedHoursText');
+      if (usedTextEl) usedTextEl.textContent = `${pkg.usedHours || 0} used (${Math.round(100 - pct)}%)`;
+
+      // Package cost & expiry
+      const costEl = document.getElementById('statPackageCost');
+      if (costEl) costEl.textContent = `Rs. ${(pkg.cost || 0).toLocaleString()}`;
+      const expiryEl = document.getElementById('statExpiryDate');
+      if (expiryEl) expiryEl.textContent = `Valid: ${pkg.endDate || '—'}`;
+
+      // Next booking stat
+      const nextB = userBookings.find(b => b.status === 'Confirmed');
+      const nextEl = document.getElementById('statNextBooking');
+      if (nextEl) nextEl.textContent = nextB ? `${nextB.date} ${nextB.time}` : '— No upcoming sessions —';
+
+      // Dynamic deductions from actual user bookings
+      const userDeductions = userBookings.length > 0 ? userBookings.map(b => ({
+        date: b.date,
+        topic: b.topic,
+        hours: b.duration,
+        tech: (b.gear && b.gear.includes("Smart Board")) ? "Smart Board Rig" : "Studio Setup"
+      })) : (state.deductions || []);
+
+      const dedBody = document.getElementById('packageDeductionsTableBody');
+      if (dedBody) {
+        dedBody.innerHTML = userDeductions.map(d => `
+          <tr><td class="p-3 font-mono text-slate-400">${d.date}</td><td class="p-3 text-white">${d.topic}</td><td class="p-3 text-[#D4AF37] font-bold">−${d.hours}h</td><td class="p-3 text-slate-400">${d.tech}</td></tr>
+        `).join('');
+      }
+
+      // User Bookings Table with Zoom Link Column
+      const bkgBody = document.getElementById('userBookingsTableBody');
+      if (bkgBody) {
+        if (userBookings.length === 0) {
+          bkgBody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-500"><svg class="w-10 h-10 mx-auto text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div class="text-sm text-slate-400 font-medium">No studio sessions scheduled yet.</div><div class="text-xs text-slate-600 mt-1">Book a slot using the button above.</div></td></tr>`;
+        } else {
+          bkgBody.innerHTML = userBookings.map(b => `
+            <tr>
+              <td class="p-4 font-mono font-semibold text-white whitespace-nowrap">${b.date} <span class="text-slate-400 block text-[10px]">${b.time}</span></td>
+              <td class="p-4 font-medium text-slate-200">${b.topic}</td>
+              <td class="p-4 text-slate-400 text-xs">${b.gear || 'Studio Rig'}</td>
+              <td class="p-4">
+                ${b.zoomLink ? `
+                  <div class="space-y-1">
+                    <button onclick="copyToClipboard('${b.zoomLink}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 border border-blue-500/25 font-semibold text-[11px] transition-all">
+                      <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                      Copy Zoom
+                    </button>
+                    <div class="text-[10px] text-slate-500 font-mono">ID: ${b.meetingId || '845 2319 4022'} • <button onclick="copyZoomInvite('${b.zoomLink}', '${b.meetingId || '845 2319 4022'}', '${b.passcode || 'THINK2026'}')" class="text-[#D4AF37] hover:underline">Copy Invite</button></div>
+                  </div>
+                ` : `<span class="text-slate-600 font-mono text-[10px]">In-Studio Only</span>`}
+              </td>
+              <td class="p-4 font-mono text-[#D4AF37] font-bold">${b.duration}h</td>
+              <td class="p-4"><span class="${b.status === 'Confirmed' ? 'badge-blue' : 'badge-green'}">${b.status}</span></td>
+              <td class="p-4 text-right">
+                ${b.status === 'Confirmed' ? `<button onclick="cancelBooking('${b.id}')" class="text-red-400 hover:underline text-xs">Cancel</button>` : `<span class="text-slate-600 text-[10px]">Archived</span>`}
+              </td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      const userPayments = user.payments || [];
+      const paymentsBody = document.getElementById('userPaymentsTableBody');
+      if (paymentsBody) {
+        paymentsBody.innerHTML = userPayments.length ? userPayments.map(p => `
+          <tr><td class="p-3 font-mono text-slate-400">${p.date || '—'}</td><td class="p-3 text-slate-300">${p.ref || '—'}</td><td class="p-3 text-emerald-400 font-bold">Rs. ${(p.amount || 0).toLocaleString()}</td><td class="p-3"><span class="badge-green">${p.status || 'Verified'}</span></td></tr>
+        `).join('') : `<tr><td colspan="4" class="p-10 text-center text-slate-500"><svg class="w-10 h-10 mx-auto text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="text-sm text-slate-400 font-medium">No payment records found.</div><div class="text-xs text-slate-600 mt-1">Upload a bank transfer slip to verify.</div></td></tr>`;
+      }
+
+      const pName = document.getElementById('profName'); if (pName) pName.value = user.name || '';
+      const pEmail = document.getElementById('profEmail'); if (pEmail) pEmail.value = user.email || '';
+      const pPhone = document.getElementById('profPhone'); if (pPhone) pPhone.value = user.phone || '';
+    }
+
+    // Modular Admin Table Renderers & Live Search
+    function renderAdminUsersList(usersList = null) {
+      const list = usersList || state.users.filter(u => u.role === 'customer');
+      const tbody = document.getElementById('adminUsersTableBody');
+      if (!tbody) return;
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-500">
+          <svg class="w-8 h-8 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <div class="text-xs text-slate-400">No customers found matching search.</div>
+        </td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map(u => `
+        <tr>
+          <td class="p-3.5">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-[#D4AF37]/12 border border-[#D4AF37]/20 flex items-center justify-center text-sm font-black text-[#D4AF37] shrink-0">${u.name.charAt(0)}</div>
+              <div>
+                <div class="font-bold text-white text-sm">${u.name}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${u.email}</div>
+              </div>
+            </div>
+          </td>
+          <td class="p-3.5 font-mono text-slate-300 text-xs">${u.phone}</td>
+          <td class="p-3.5 text-[#D4AF37] font-semibold text-xs">${u.package ? u.package.name : '—'}</td>
+          <td class="p-3.5">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-emerald-400 text-xs">${u.package ? u.package.remainingHours : 0}h</span>
+              ${u.package ? `<div class="w-16 h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-emerald-400 rounded-full" style="width:${Math.min(100, u.package.totalHours > 0 ? u.package.remainingHours/u.package.totalHours*100 : 0)}%"></div></div>` : ''}
+            </div>
+          </td>
+          <td class="p-3.5"><span class="${(u.balanceDue||0) > 0 ? 'badge-amber' : 'badge-green'} text-xs">Rs. ${(u.balanceDue || 0).toLocaleString()}</span></td>
+          <td class="p-3.5 text-right">
+            <button onclick="syncSingleUserToSheet('${u.email}')" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 text-[10px] font-mono transition-all">⚡ Sync</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminBookingsList(bookingsList = null) {
+      const list = bookingsList || state.bookings;
+      const tbody = document.getElementById('adminBookingsTableBody');
+      if (!tbody) return;
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-500">
+          <svg class="w-8 h-8 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div class="text-xs text-slate-400">No studio sessions found matching search.</div>
+        </td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map(b => `
+        <tr>
+          <td class="p-3 font-mono font-semibold text-white whitespace-nowrap">${b.date} <span class="text-slate-400 text-[10px] block">${b.time}</span></td>
+          <td class="p-3 font-semibold text-slate-200 text-sm">${b.userName}</td>
+          <td class="p-3 text-slate-400 text-xs">${b.gear}</td>
+          <td class="p-3">
+            ${b.zoomLink ? `
+              <div class="flex items-center gap-2">
+                <a href="${b.zoomLink}" target="_blank" class="text-blue-400 hover:underline font-mono text-xs font-semibold">Launch Zoom</a>
+                <button onclick="openAdminZoomModal('${b.id}')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] transition-all">Edit</button>
+              </div>
+            ` : `<button onclick="openAdminZoomModal('${b.id}')" class="px-2 py-1 rounded-lg bg-blue-500/15 text-blue-400 hover:bg-blue-500/25 text-[10px] font-mono transition-all">+ Add Zoom</button>`}
+          </td>
+          <td class="p-3 font-mono text-[#D4AF37] font-bold">${b.duration}h</td>
+          <td class="p-3"><span class="${b.status === 'Confirmed' ? 'badge-blue' : 'badge-green'}">${b.status}</span></td>
+          <td class="p-3 text-right space-x-2 whitespace-nowrap">
+            ${b.status === 'Confirmed' ? `
+              <button onclick="markBookingCompleted('${b.id}')" class="text-emerald-400 hover:underline text-xs">✓ Done</button>
+              <button onclick="adminCancelBooking('${b.id}')" class="text-red-400 hover:underline text-xs">✕</button>
+            ` : `<span class="text-slate-600 text-[10px]">Archived</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterAdminUsers(query) {
+      const q = query.toLowerCase().trim();
+      const filtered = state.users.filter(u => u.role === 'customer' && (u.name.toLowerCase().includes(q) || u.phone.includes(q) || u.email.toLowerCase().includes(q)));
+      renderAdminUsersList(filtered);
+    }
+
+    function filterAdminBookings(query) {
+      const q = query.toLowerCase().trim();
+      const filtered = state.bookings.filter(b => b.userName.toLowerCase().includes(q) || b.topic.toLowerCase().includes(q) || b.date.includes(q));
+      renderAdminBookingsList(filtered);
+    }
+
+    // Admin Dashboard Rendering
+    function renderAdminDashboard() {
+      document.getElementById('kpiTotalUsers').textContent = state.users.filter(u => u.role === 'customer').length;
+      document.getElementById('kpiActivePackages').textContent = state.users.filter(u => u.package).length;
+      document.getElementById('adminPendingSlipsBadge').textContent = state.pendingSlips.length;
+
+      // Calculate KPI totals
+      const customers = state.users.filter(u => u.role === 'customer');
+      const totalRevenue = customers.reduce((s, u) => s + (u.package ? u.package.cost : 0), 0);
+      const totalDue = customers.reduce((s, u) => s + (u.balanceDue || 0), 0);
+      const totalCollected = totalRevenue - totalDue;
+      const kpiColl = document.getElementById('kpiTotalCollected');
+      if (kpiColl) kpiColl.textContent = `Rs. ${totalCollected.toLocaleString()}`;
+      const kpiDue = document.getElementById('kpiDueBalances');
+      if (kpiDue) kpiDue.textContent = `Rs. ${totalDue.toLocaleString()}`;
+      const kpiSess = document.getElementById('kpiUpcomingBookings');
+      if (kpiSess) kpiSess.textContent = state.bookings.filter(b => b.status === 'Confirmed').length;
+
+      renderAdminUsersList();
+      renderAdminBookingsList();
+
+      // Populate adjust-hours select
+      const sel = document.getElementById('adminAdjustUserSelect');
+      if (sel) {
+        sel.innerHTML = customers.map(u => `<option value="${u.email}">${u.name}</option>`).join('');
+      }
+
+      document.getElementById('adminPendingSlipsList').innerHTML = state.pendingSlips.map(s => `
+        <div class="p-4 rounded-xl bg-black/30 border border-[#D4AF37]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="font-bold text-white">${s.userName}</span>
+            <span class="text-slate-400 text-[11px] block font-mono mt-0.5">Ref: ${s.ref} • ${s.method || 'Bank Transfer'} • ${s.date}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <strong class="text-emerald-400 font-mono text-base mr-1">Rs. ${s.amount.toLocaleString()}</strong>
+            <button onclick="adminApproveSlip('${s.id}')" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs shadow transition-all">✓ Approve</button>
+            <button onclick="adminRejectSlip('${s.id}')" class="px-3.5 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/25 text-xs transition-all">✕ Reject</button>
+          </div>
+        </div>
+      `).join('') || `<div class="p-8 text-center text-slate-500">
+          <svg class="w-8 h-8 mx-auto text-emerald-500/50 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div class="text-xs text-slate-400">All payment slips verified. Zero pending.</div>
+        </div>`;
+
+      const allPayments = state.allPayments || (state.users ? state.users.flatMap(u => (u.payments || []).map(p => ({...p, userName: u.name}))) : []);
+      document.getElementById('adminAllPaymentsTableBody').innerHTML = allPayments.map(p => `
+        <tr>
+          <td class="p-3 font-mono text-slate-400 text-xs">${p.date}</td>
+          <td class="p-3 font-semibold text-white text-sm">${p.user_name || p.userName || 'Customer'}</td>
+          <td class="p-3 font-mono text-slate-400 text-xs">${p.ref}</td>
+          <td class="p-3 text-slate-300 text-xs">${p.method || "People's Bank"}</td>
+          <td class="p-3 font-mono font-bold text-emerald-400">Rs. ${(p.amount || 0).toLocaleString()}</td>
+          <td class="p-3 text-right"><span class="badge-green">${p.status || 'Verified'}</span></td>
+        </tr>
+      `).join('') || `<tr><td colspan="6" class="p-10 text-center text-slate-500">
+          <svg class="w-8 h-8 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <div class="text-xs text-slate-400">No payment records found in ledger.</div>
+        </td></tr>`;
+
+      document.getElementById('adminReviewsTableBody').innerHTML = state.reviews.map(r => `
+        <tr>
+          <td class="p-3 text-white font-medium">${r.author}</td>
+          <td class="p-3 text-amber-400 font-mono text-base">${'★'.repeat(r.rating)}</td>
+          <td class="p-3 text-slate-300 text-xs max-w-xs">${r.comment}</td>
+        </tr>
+      `).join('');
+
+      // Populate settings forms
+      const bk = state.studioBank;
+      const accEl = document.getElementById('adminBankNameAcc'); if (accEl) accEl.value = bk.accountName;
+      const bnEl = document.getElementById('adminBankName'); if (bnEl) bnEl.value = bk.bankName;
+      const brEl = document.getElementById('adminBranch'); if (brEl) brEl.value = bk.branch;
+      const anEl = document.getElementById('adminAccNum'); if (anEl) anEl.value = bk.accountNumber;
+    }
+
+    function renderPublicReviews() {
+      const starSvg = `<svg class="w-4 h-4 text-[#D4AF37] fill-[#D4AF37] inline-block" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+      const starEmptySvg = `<svg class="w-4 h-4 text-slate-600 fill-slate-800 inline-block" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+
+      document.getElementById('publicReviewsGrid').innerHTML = state.reviews.map(r => `
+        <div class="card-gold-3d rounded-2xl p-6 tilt-card fade-in">
+          <div class="flex items-start gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-base font-black text-[#D4AF37] shrink-0">${r.author.charAt(0)}</div>
+            <div>
+              <div class="text-sm font-bold text-white">${r.author}</div>
+              <div class="text-[10px] text-slate-400">${r.role}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 mb-3">
+            ${Array.from({length: 5}, (_, i) => i < r.rating ? starSvg : starEmptySvg).join('')}
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed italic">"${r.comment}"</p>
+        </div>
+      `).join('');
+    }
+
+    function setUserDashTab(t) {
+      ['overview','package','bookings','payments','bank','reviews','profile'].forEach(x => {
+        const b = document.getElementById(`uTabBtn-${x}`); const v = document.getElementById(`uTab-${x}`);
+        if (b && v) {
+          if (x === t) { b.className = "user-dash-tab active whitespace-nowrap px-4 py-2.5 rounded-xl bg-[#D4AF37] text-black font-bold text-xs flex items-center gap-2 transition-all"; v.classList.remove('hidden'); v.classList.add('fade-in'); }
+          else { b.className = "user-dash-tab whitespace-nowrap px-4 py-2.5 rounded-xl glass text-slate-300 hover:text-white transition-colors text-xs font-semibold flex items-center gap-2"; v.classList.add('hidden'); }
+        }
+      });
+    }
+
+    function setAdminDashTab(t) {
+      ['overview','users','packages','bookings','payments','reviews','settings','gsheet'].forEach(x => {
+        const b = document.getElementById(`aTabBtn-${x}`); const v = document.getElementById(`aTab-${x}`);
+        if (b && v) {
+          if (x === t) {
+            b.className = "admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-semibold text-[#D4AF37] bg-[#D4AF37]/8 border-l-2 border-[#D4AF37] transition-all";
+            v.classList.remove('hidden'); v.classList.add('fade-in');
+          } else {
+            b.className = "admin-dash-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent";
+            v.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    async function triggerGoogleSheetSync() {
+      showDbToast("Syncing customer records to Google Sheet...");
+      try {
+        const res = await fetch('/api/sync/google-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        if (res.ok) {
+          const data = await res.json();
+          showDbToast(`✓ Successfully synced ${data.syncedCount || state.users.filter(u => u.role === 'customer').length} user(s) to Google Sheet!`);
+        } else {
+          clientSideSyncAllToSheet();
+        }
+      } catch (err) {
+        clientSideSyncAllToSheet();
+      }
+    }
+
+    function clientSideSyncAllToSheet() {
+      const customers = state.users.filter(u => u.role === 'customer');
+      customers.forEach(u => syncUserToGoogleSheet(u));
+      showDbToast(`✓ Synced ${customers.length} customer(s) to Google Sheet!`);
+    }
+
+    function syncSingleUserToSheet(userEmail) {
+      const user = state.users.find(u => u.email === userEmail);
+      if (user) {
+        syncUserToGoogleSheet(user);
+        showDbToast(`✓ Synced ${user.name} to Google Sheet!`);
+      }
+    }
+
+    function syncUserToGoogleSheet(user, paymentInfo = null) {
+      const webhookUrl = state.googleSheetWebhook || 'https://script.google.com/macros/s/AKfycbxLeyn0FBSFH6AGSIG_SoEXWMPmb1Pu5HTz5-uXgljJkF1ePSa8b2Dg-_F0QzjdSjx0/exec';
+      if (!webhookUrl) return;
+
+      const pkgName = user.package ? user.package.name : 'Monthly Package';
+      const totalH = user.package ? (user.package.totalHours || 20) : 20;
+      const remH = user.package ? (user.package.remainingHours !== undefined ? user.package.remainingHours : 12) : 12;
+      const usedH = user.package ? (user.package.usedHours !== undefined ? user.package.usedHours : Math.max(0, totalH - remH)) : Math.max(0, totalH - remH);
+      const pkgPrice = user.package ? (user.package.cost || 12000) : 12000;
+      const balDue = user.balanceDue !== undefined ? user.balanceDue : 0;
+      const paidAmt = Math.max(0, pkgPrice - balDue);
+      const status = remH > 0 ? 'Active' : 'Expired';
+
+      const payload = {
+        action: paymentInfo ? 'payment_verified' : 'sync_user',
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 16),
+        month: new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+        id: user.id || '',
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        packageName: pkgName,
+        packagePrice: pkgPrice,
+        paidAmount: paidAmt,
+        balanceDue: balDue,
+        totalHours: totalH,
+        usedHours: usedH,
+        remainingHours: remH,
+        status: status,
+        org: user.org || ''
+      };
+
+      if (paymentInfo) {
+        payload.payment = paymentInfo;
+      }
+
+      try {
+        fetch(webhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Google Sheet sync notice:", e);
+      }
+    }
+
+    async function handleSaveGsheetWebhook(e) {
+      e.preventDefault();
+      const urlInput = document.getElementById('adminGsheetWebhookUrl') || document.getElementById('adminSettingsGsheetUrl');
+      const url = urlInput ? urlInput.value.trim() : '';
+      if (!url) return;
+      state.googleSheetWebhook = url;
+      saveState(state);
+
+      const w1 = document.getElementById('adminGsheetWebhookUrl');
+      if (w1) w1.value = url;
+      const w2 = document.getElementById('adminSettingsGsheetUrl');
+      if (w2) w2.value = url;
+
+      try {
+        await fetch('/api/settings/google-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webhookUrl: url })
+        });
+      } catch (err) {
+        console.warn(err);
+      }
+
+      const msg1 = document.getElementById('gsheetSavedMsg');
+      if (msg1) { msg1.classList.remove('hidden'); setTimeout(() => msg1.classList.add('hidden'), 3000); }
+      const msg2 = document.getElementById('adminSettingsGsheetSavedMsg');
+      if (msg2) { msg2.classList.remove('hidden'); setTimeout(() => msg2.classList.add('hidden'), 3000); }
+
+      showDbToast("✓ Google Sheet Webhook saved in database!");
+    }
+
+    function testGsheetWebhook() {
+      const demoUser = state.users.find(u => u.role === 'customer') || {
+        id: 'u-1',
+        name: 'Dr. Rajesh Sharma',
+        email: 'dr.rajesh@gmail.com',
+        phone: '+94 77 123 4567',
+        package: { name: 'Monthly Package', totalHours: 20, remainingHours: 12 },
+        balanceDue: 4000,
+        org: 'Apex Physics Academy'
+      };
+      syncUserToGoogleSheet(demoUser);
+      showDbToast("✓ Test record sent to Google Sheet! Check your spreadsheet tab.");
+    }
+
+    function exportUsersToCsv() {
+      const customers = state.users.filter(u => u.role === 'customer');
+      const headers = ["Timestamp", "User ID", "Customer Name", "Email", "Phone", "Package", "Total Hours", "Remaining Hours", "Outstanding Balance", "Organization"];
+      const rows = customers.map(u => [
+        `"${new Date().toLocaleString()}"`,
+        `"${u.id}"`,
+        `"${u.name}"`,
+        `"${u.email}"`,
+        `"${u.phone}"`,
+        `"${u.package ? u.package.name : ''}"`,
+        u.package ? u.package.totalHours : 0,
+        u.package ? u.package.remainingHours : 0,
+        `"Rs. ${u.balanceDue || 0}"`,
+        `"${u.org || ''}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `think_studio_users_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showDbToast("✓ Customer records exported to CSV!");
+    }
+
+    async function copyGoogleAppsScriptCode() {
+      try {
+        const res = await fetch('/google_apps_script_code.js');
+        if (res.ok) {
+          const code = await res.text();
+          await navigator.clipboard.writeText(code);
+          showDbToast("✓ Full Google Apps Script (Code.gs) copied! Paste in Extensions > Apps Script.");
+          return;
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+      window.open('/google_apps_script_code.js', '_blank');
+      showDbToast("✓ Google Apps Script code opened in new tab!");
+    }
+
+    async function loadSampleDataToSheet() {
+      showDbToast("Streaming 5 realistic sample customers to Google Sheet...");
+      const samples = [
+        { id: "u-1", name: "Dr. Rajesh Sharma", email: "dr.rajesh@gmail.com", phone: "+94 77 123 4567", package: { name: "Monthly Package", totalHours: 20, remainingHours: 12, cost: 12000, usedHours: 8 }, balanceDue: 4000, org: "Apex Physics Academy" },
+        { id: "u-2", name: "Mrs. Anoma Jayawardena", email: "anoma.j@gmail.com", phone: "+94 71 889 2341", package: { name: "10-Hour Flex Package", totalHours: 10, remainingHours: 6, cost: 7500, usedHours: 4 }, balanceDue: 0, org: "Royal Combined Maths" },
+        { id: "u-3", name: "Prof. Nimal Perera", email: "nimal.p@gmail.com", phone: "+94 72 456 7890", package: { name: "Monthly Package", totalHours: 20, remainingHours: 5, cost: 12000, usedHours: 15 }, balanceDue: 0, org: "National Biology Institute" },
+        { id: "u-4", name: "Mr. Kasun Bandara", email: "kasun.ict@gmail.com", phone: "+94 75 334 1122", package: { name: "Single Masterclass", totalHours: 3, remainingHours: 0, cost: 3500, usedHours: 3 }, balanceDue: 0, org: "Future Innovators ICT" },
+        { id: "u-5", name: "Dr. Chamari Wickramasinghe", email: "chamari.chem@gmail.com", phone: "+94 76 990 4455", package: { name: "Monthly Package", totalHours: 20, remainingHours: 18, cost: 12000, usedHours: 2 }, balanceDue: 6000, org: "Chemistry Foundation" }
+      ];
+
+      for (let s of samples) {
+        syncUserToGoogleSheet(s);
+        await new Promise(r => setTimeout(r, 350));
+      }
+
+      // Stream sample verified payment for the side table
+      syncUserToGoogleSheet(samples[1], {
+        date: "2026-09-28",
+        amount: 7500,
+        ref: "PB-7842109",
+        method: "People's Bank Godakawela",
+        status: "Verified"
+      });
+
+      showDbToast("✓ 5 Sample customers & payments streamed to your Google Sheet!");
+    }
+
+    function handleSelectPackage(name, cost, hours) {
+      if (!state.currentUser) openAuthModal('register');
+      else { navigateTo('user'); setUserDashTab('package'); }
+    }
+
+    // Zoom Helpers
+    function autoGenerateZoomLink() {
+      const randId = Math.floor(10000000000 + Math.random() * 90000000000);
+      document.getElementById('bkgZoomLink').value = `https://zoom.us/j/${randId}?pwd=THINKSTUDIO2026`;
+    }
+
+    function handleGearChange(val) {
+      if (val.includes("Zoom")) {
+        autoGenerateZoomLink();
+      }
+    }
+
+    function copyZoomInvite(url, id, pass) {
+      const text = `🎓 *Think Studio — Live Online Class Invitation*\nTopic: Live Lecture Session\nMeeting URL: ${url}\nMeeting ID: ${id}\nPasscode: ${pass}\n\nPlease join 5 minutes before the session starts.`;
+      copyToClipboard(text);
+      showDbToast("✓ Student Zoom invitation copied to clipboard!");
+    }
+
+    function copyCurrentZoomDetails() {
+      const urlEl = document.getElementById('dashZoomUrlLink');
+      const idEl = document.getElementById('dashZoomIdText');
+      const passEl = document.getElementById('dashZoomPassText');
+      const url = urlEl ? urlEl.textContent.trim() : '';
+      const id = idEl ? idEl.textContent.trim() : '';
+      const pass = passEl ? passEl.textContent.trim() : '';
+      if (!url || url.includes('—')) {
+        showDbToast("No active Zoom link available to copy.");
+        return;
+      }
+      copyZoomInvite(url, id, pass);
+    }
+
+    function copyToClipboard(text) {
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showDbToast(`✓ Copied: ${text.length > 25 ? text.substring(0, 25) + '...' : text}`);
+        }).catch(() => {
+          fallbackCopyText(text);
+        });
+      } else {
+        fallbackCopyText(text);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showDbToast(`✓ Copied: ${text.length > 25 ? text.substring(0, 25) + '...' : text}`);
+      } catch (err) {
+        showDbToast("✓ Ready to paste");
+      }
+      document.body.removeChild(ta);
+    }
+
+    // Admin Zoom Modal
+    function openAdminZoomModal(bookingId) {
+      const b = state.bookings.find(x => x.id === bookingId);
+      if (!b) return;
+      document.getElementById('adminZoomBookingId').value = b.id;
+      document.getElementById('adminZoomBookingInfo').textContent = `${b.userName} • ${b.topic} (${b.date})`;
+      document.getElementById('adminZoomUrl').value = b.zoomLink || `https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026`;
+      document.getElementById('adminZoomId').value = b.meetingId || "845 2319 4022";
+      document.getElementById('adminZoomPass').value = b.passcode || "THINK2026";
+      document.getElementById('adminZoomModal').classList.remove('hidden');
+    }
+
+    function closeAdminZoomModal() {
+      document.getElementById('adminZoomModal').classList.add('hidden');
+    }
+
+    async function handleSaveAdminZoom(e) {
+      e.preventDefault();
+      const bId = document.getElementById('adminZoomBookingId').value;
+      const zoomUrl = document.getElementById('adminZoomUrl').value.trim();
+      const zoomId = document.getElementById('adminZoomId').value.trim();
+      const zoomPass = document.getElementById('adminZoomPass').value.trim();
+      const b = state.bookings.find(x => x.id === bId);
+      if (b) {
+        b.zoomLink = zoomUrl;
+        b.meetingId = zoomId;
+        b.passcode = zoomPass;
+        saveState(state);
+      }
+      try {
+        await fetch('/api/bookings/update-zoom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId: bId, zoomLink: zoomUrl, meetingId: zoomId, passcode: zoomPass })
+        });
+        showDbToast("✓ Zoom link saved to SQLite Database (think_studio.db)!");
+      } catch (err) {
+        console.warn("Offline DB, saved locally", err);
+      }
+      renderApp();
+      closeAdminZoomModal();
+    }
+
+    async function handleAdminUpdateDefaultZoom(e) {
+      e.preventDefault();
+      const zoomUrl = document.getElementById('adminDefZoomUrl').value.trim();
+      const zoomId = document.getElementById('adminDefZoomId').value.trim();
+      const zoomPass = document.getElementById('adminDefZoomPass').value.trim();
+
+      state.bookings.forEach(b => {
+        b.zoomLink = zoomUrl;
+        b.meetingId = zoomId;
+        b.passcode = zoomPass;
+      });
+      saveState(state);
+
+      try {
+        await fetch('/api/bookings/update-zoom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId: 'all', zoomLink: zoomUrl, meetingId: zoomId, passcode: zoomPass })
+        });
+        showDbToast("✓ Universal Zoom meeting link saved in SQLite DB!");
+      } catch (err) {
+        console.warn("Offline DB", err);
+      }
+      renderApp();
+      const msg = document.getElementById('adminZoomSavedMsg');
+      if (msg) {
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 3500);
+      }
+    }
+
+    // Booking Submission
+    function openBookingModal(t = "Book Studio Slot") {
+      document.getElementById('modalBookingTitle').textContent = t;
+      document.getElementById('bookingModal').classList.remove('hidden');
+    }
+    function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); }
+
+    async function handleConfirmBooking(e) {
+      e.preventDefault();
+      if (!state.currentUser) { closeBookingModal(); openAuthModal('register'); return; }
+      const dur = parseInt(document.getElementById('bkgDuration').value);
+      const gear = document.getElementById('bkgGear').value;
+      const zoomLink = document.getElementById('bkgZoomLink').value || (gear.includes("Zoom") ? "https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026" : "");
+      const bkgTopic = document.getElementById('bkgTopic').value;
+      const bkgDate = document.getElementById('bkgDate').value;
+      const bkgSlot = document.getElementById('bkgSlot').value;
+
+      if (state.currentUser.role === 'customer') {
+        if (state.currentUser.package.remainingHours < dur) { alert("Insufficient hours in package!"); return; }
+        state.currentUser.package.remainingHours -= dur;
+        state.currentUser.package.usedHours += dur;
+        state.deductions.unshift({ date: bkgDate, topic: bkgTopic, hours: dur, tech: "Assigned", status: "Scheduled" });
+      }
+
+      const bookingObj = {
+        id: "B-" + Date.now().toString().slice(-4),
+        userEmail: state.currentUser.email,
+        userName: state.currentUser.name,
+        date: bkgDate,
+        time: bkgSlot,
+        duration: dur,
+        topic: bkgTopic,
+        gear: gear,
+        zoomLink: zoomLink,
+        meetingId: "845 2319 4022",
+        passcode: "THINK2026",
+        status: "Confirmed"
+      };
+
+      state.bookings.unshift(bookingObj);
+      saveState(state);
+      renderApp();
+      closeBookingModal();
+
+      try {
+        await fetch('/api/bookings/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookingObj)
+        });
+        showDbToast("✓ Booking and Zoom link saved in SQLite Database!");
+      } catch (err) {
+        console.warn("DB offline", err);
+      }
+    }
+
+    async function cancelBooking(id) {
+      const idx = state.bookings.findIndex(b => b.id === id);
+      if (idx !== -1 && confirm("Cancel this studio session? Your package hours will be refunded.")) {
+        const b = state.bookings[idx];
+        if (state.currentUser && state.currentUser.role === 'customer') {
+          state.currentUser.package.remainingHours += b.duration;
+          state.currentUser.package.usedHours = Math.max(0, state.currentUser.package.usedHours - b.duration);
+        }
+        state.bookings.splice(idx, 1);
+        saveState(state);
+        renderApp();
+
+        try {
+          await fetch('/api/bookings/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId: id, restoreHours: true })
+          });
+          showDbToast("✓ Booking cancelled & hours restored in SQLite database!");
+        } catch (err) {
+          console.warn("DB offline", err);
+        }
+      }
+    }
+
+    async function markBookingCompleted(id) {
+      const b = state.bookings.find(bk => bk.id === id);
+      if (b) {
+        b.status = "Completed";
+        saveState(state);
+        renderApp();
+
+        try {
+          await fetch('/api/bookings/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId: id })
+          });
+          showDbToast(`✓ Session ${id} marked as Completed in SQLite DB!`);
+        } catch (err) {
+          console.warn("DB offline", err);
+        }
+      }
+    }
+
+    async function adminCancelBooking(id) {
+      if (confirm("Cancel this booking from the studio schedule?")) {
+        const idx = state.bookings.findIndex(bk => bk.id === id);
+        if (idx !== -1) {
+          state.bookings.splice(idx, 1);
+          saveState(state);
+          renderApp();
+
+          try {
+            await fetch('/api/bookings/cancel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bookingId: id, restoreHours: true })
+            });
+            showDbToast("✓ Booking removed and hours refunded in SQLite database!");
+          } catch (err) {
+            console.warn("DB offline", err);
+          }
+        }
+      }
+    }
+
+    // Slips & Payments (Connected to SQLite database think_studio.db)
+    async function handleCustomerSlipUpload(e) {
+      e.preventDefault();
+      const amount = parseInt(document.getElementById('slipAmount').value);
+      const ref = document.getElementById('slipRef').value;
+      const slipObj = {
+        id: "SLIP-" + Date.now(),
+        userEmail: state.currentUser.email,
+        userName: state.currentUser.name,
+        amount: amount,
+        ref: ref,
+        date: new Date().toISOString().split('T')[0],
+        status: "Pending Verification",
+        method: "People's Bank Godakawela"
+      };
+      state.pendingSlips.unshift(slipObj);
+      saveState(state);
+      renderApp();
+      document.getElementById('slipSuccessMsg').classList.remove('hidden');
+
+      try {
+        await fetch('/api/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(slipObj)
+        });
+        showDbToast(`✓ Payment slip saved in SQLite DB (Ref: ${ref})!`);
+      } catch (err) {
+        console.warn("DB offline", err);
+      }
+    }
+
+    async function adminApproveSlip(id) {
+      const idx = state.pendingSlips.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        const s = state.pendingSlips[idx];
+        const u = state.users.find(x => x.email === s.userEmail);
+        if (u) {
+          const payRecord = { id: "P-" + Date.now(), date: s.date, ref: s.ref, method: s.method || "People's Bank Transfer", amount: s.amount, status: "Verified" };
+          u.payments.push(payRecord);
+          u.balanceDue = Math.max(0, u.balanceDue - s.amount);
+          syncUserToGoogleSheet(u, payRecord);
+        }
+        state.pendingSlips.splice(idx, 1);
+        saveState(state);
+        renderApp();
+
+        try {
+          await fetch('/api/payments/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slipId: id })
+          });
+          showDbToast(`✓ Payment ${id} verified in SQLite DB & synced to Google Sheet!`);
+        } catch (err) {
+          console.warn("DB offline", err);
+        }
+      }
+    }
+
+    async function adminRejectSlip(id) {
+      if (!confirm("Reject and dismiss this payment slip?")) return;
+      const idx = state.pendingSlips.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        state.pendingSlips.splice(idx, 1);
+        saveState(state);
+        renderApp();
+
+        try {
+          await fetch('/api/payments/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slipId: id })
+          });
+          showDbToast(`✓ Slip ${id} rejected & dismissed.`);
+        } catch (err) {
+          console.warn("DB offline", err);
+        }
+      }
+    }
+
+    async function handleAdminAdjustHours(e) {
+      e.preventDefault();
+      const val = parseInt(document.getElementById('adminAdjustHoursVal').value);
+      const userEmail = document.getElementById('adminAdjustUserSelect').value;
+      const u = state.users.find(x => x.email === userEmail);
+      if (u) {
+        u.package.remainingHours += val;
+        u.package.totalHours += val;
+        syncUserToGoogleSheet(u);
+        saveState(state);
+        renderApp();
+
+        try {
+          await fetch('/api/users/adjust-hours', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userEmail: userEmail, delta: val })
+          });
+          showDbToast(`✓ Hours updated in SQLite Database (${val > 0 ? '+' + val : val}h) & synced to Google Sheet!`);
+        } catch (err) {
+          console.warn("DB offline", err);
+        }
+      }
+    }
+
+    function handleWriteReviewClick() {
+      if (!state.currentUser) openAuthModal('login');
+      else openReviewModal();
+    }
+    function openReviewModal() { document.getElementById('reviewModal').classList.remove('hidden'); }
+    function closeReviewModal() { document.getElementById('reviewModal').classList.add('hidden'); }
+
+    async function handleSubmitReview(e) {
+      e.preventDefault();
+      const revObj = {
+        id: "r-" + Date.now(),
+        author: document.getElementById('revAuthor').value.trim(),
+        role: document.getElementById('revRole').value.trim() || 'Educator',
+        rating: parseInt(document.getElementById('revRating').value),
+        comment: document.getElementById('revComment').value.trim(),
+        featured: false,
+        status: "Approved"
+      };
+      state.reviews.unshift(revObj);
+      saveState(state);
+      renderApp();
+      closeReviewModal();
+      showDbToast("✓ Thank you! Review saved in SQLite database!");
+
+      try {
+        await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(revObj)
+        });
+      } catch (err) {
+        console.warn("DB offline", err);
+      }
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      state.currentUser.name = name;
+      state.currentUser.phone = phone;
+      saveState(state);
+      renderApp();
+
+      const msg = document.getElementById('profSavedMsg');
+      if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3000); }
+      showDbToast("✓ Profile updated in SQLite DB & synced to Google Sheet!");
+
+      try {
+        await fetch('/api/users/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: state.currentUser.email, name: name, phone: phone })
+        });
+      } catch (err) {
+        console.warn("DB offline", err);
+      }
+    }
+
+    async function handleUpdateStudioBank(e) {
+      e.preventDefault();
+      const bankData = {
+        accountName: document.getElementById('adminBankNameAcc').value.trim(),
+        bankName: document.getElementById('adminBankName').value.trim(),
+        branch: document.getElementById('adminBranch').value.trim(),
+        accountNumber: document.getElementById('adminAccNum').value.trim(),
+        phone: "0702663137",
+        email: "thinkstudiocontact@gmail.com"
+      };
+      state.studioBank = bankData;
+      saveState(state);
+      renderApp();
+
+      const msg = document.getElementById('adminBankSavedMsg');
+      if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3500); }
+      showDbToast("✓ Studio bank details saved in SQLite database!");
+
+      try {
+        await fetch('/api/settings/studio-bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bankData)
+        });
+      } catch (err) {
+        console.warn("DB offline", err);
+      }
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>
+

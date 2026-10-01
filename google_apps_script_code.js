@@ -294,15 +294,16 @@ function setupThinkStudioDashboard() {
   sheet.setRowHeight(28, 24);
 
   const packagesData = [
-    ["Monthly Package (20 Hours)", 12000, '=COUNTIF(F4:F100,"*Monthly*")', '=SUMIF(F4:F100,"*Monthly*",J4:J100)', '=SUMIF(F4:F100,"*Monthly*",K4:K100)', '=SUMIF(F4:F100,"*Monthly*",L4:L100)'],
-    ["10-Hour Flex Package", 7500, '=COUNTIF(F4:F100,"*Flex*")', '=SUMIF(F4:F100,"*Flex*",J4:J100)', '=SUMIF(F4:F100,"*Flex*",K4:K100)', '=SUMIF(F4:F100,"*Flex*",L4:L100)'],
-    ["Single Masterclass (3 Hours)", 3500, '=COUNTIF(F4:F100,"*Masterclass*")', '=SUMIF(F4:F100,"*Masterclass*",J4:J100)', '=SUMIF(F4:F100,"*Masterclass*",K4:K100)', '=SUMIF(F4:F100,"*Masterclass*",L4:L100)'],
-    ["TOTAL STUDIO USAGE", '=SUM(P29:P31)', '=SUM(Q29:Q31)', '=SUM(R29:R31)', '=SUM(S29:S31)', '=SUM(T29:T31)']
+    ["Single Module (2 Hours)", 1800, '=COUNTIF(F4:F, "*Single*")', '=SUMIF(F4:F, "*Single*", J4:J)', '=SUMIF(F4:F, "*Single*", K4:K)', '=SUMIF(F4:F, "*Single*", L4:L)'],
+    ["Pro Lecturer (10 Hours)", 7500, '=COUNTIF(F4:F, "*Pro*") + COUNTIF(F4:F, "*Flex*")', '=SUMIF(F4:F, "*Pro*", J4:J) + SUMIF(F4:F, "*Flex*", J4:J)', '=SUMIF(F4:F, "*Pro*", K4:K) + SUMIF(F4:F, "*Flex*", K4:K)', '=SUMIF(F4:F, "*Pro*", L4:L) + SUMIF(F4:F, "*Flex*", L4:L)'],
+    ["Monthly Package (20 Hours)", 12000, '=COUNTIF(F4:F, "*Monthly*") + COUNTIF(F4:F, "*Master*")', '=SUMIF(F4:F, "*Monthly*", J4:J) + SUMIF(F4:F, "*Master*", J4:J)', '=SUMIF(F4:F, "*Monthly*", K4:K) + SUMIF(F4:F, "*Master*", K4:K)', '=SUMIF(F4:F, "*Monthly*", L4:L) + SUMIF(F4:F, "*Master*", L4:L)'],
+    ["Unlimited Prime (40 Hours)", 20000, '=COUNTIF(F4:F, "*Unlimited*") + COUNTIF(F4:F, "*Prime*")', '=SUMIF(F4:F, "*Unlimited*", J4:J) + SUMIF(F4:F, "*Prime*", J4:J)', '=SUMIF(F4:F, "*Unlimited*", K4:K) + SUMIF(F4:F, "*Prime*", K4:K)', '=SUMIF(F4:F, "*Unlimited*", L4:L) + SUMIF(F4:F, "*Prime*", L4:L)'],
+    ["TOTAL STUDIO USAGE", '=SUM(P29:P32)', '=SUM(Q29:Q32)', '=SUM(R29:R32)', '=SUM(S29:S32)', '=SUM(T29:T32)']
   ];
-  sheet.getRange("O29:T32").setValues(packagesData).setFontSize(9).setBackground("#0F1117").setFontColor("#F1F5F9");
-  sheet.getRange("O32:T32").setBackground("#1E2028").setFontColor("#D4AF37").setFontWeight("bold");
-  sheet.getRange("P29:P32").setNumberFormat("[$Rs. ]#,##0.00");
-  sheet.getRange("Q29:T32").setHorizontalAlignment("center");
+  sheet.getRange("O29:T33").setValues(packagesData).setFontSize(9).setBackground("#0F1117").setFontColor("#F1F5F9");
+  sheet.getRange("O33:T33").setBackground("#1E2028").setFontColor("#D4AF37").setFontWeight("bold");
+  sheet.getRange("P29:P33").setNumberFormat("[$Rs. ]#,##0.00");
+  sheet.getRange("Q29:T33").setHorizontalAlignment("center");
 
   // Column Widths for Right Side Dashboard
   sheet.setColumnWidth(15, 140); // Month / Date / Package
@@ -432,16 +433,30 @@ function upsertCustomerRow(sheet, data) {
     sheet.getRange(targetRow, 1, 1, rowValues.length).setBorder(true, true, true, true, true, true, "#334155", SpreadsheetApp.BorderStyle.SOLID);
     return { action: "updated", row: targetRow };
   } else {
-    // APPEND new customer row
-    // Find next empty row in Column C
-    const namesCol = sheet.getRange("C4:C100").getValues();
-    let emptyRow = 4;
+    // APPEND new customer row dynamically across all rows (No 100-row limit)
+    const lastRow = Math.max(4, sheet.getLastRow());
+    let emptyRow = -1;
+
+    // Scan column C (Customer Name) from row 4 to lastRow
+    const numRowsToCheck = Math.max(1, lastRow - 3);
+    const namesCol = sheet.getRange(4, 3, numRowsToCheck, 1).getValues();
     for (let k = 0; k < namesCol.length; k++) {
       if (!namesCol[k][0] || namesCol[k][0].toString().trim() === "") {
         emptyRow = k + 4;
         break;
       }
     }
+
+    // If all existing rows are full, append at lastRow + 1 (never overwrite row 4!)
+    if (emptyRow === -1) {
+      emptyRow = lastRow + 1;
+    }
+
+    // If emptyRow exceeds sheet capacity, automatically add rows
+    if (emptyRow > sheet.getMaxRows()) {
+      sheet.insertRowsAfter(sheet.getMaxRows(), 50);
+    }
+
     sheet.getRange(emptyRow, 1, 1, rowValues.length).setValues([rowValues]);
     sheet.getRange(emptyRow, 1, 1, rowValues.length).setBackground("#12141F").setFontColor("#F8FAFC").setFontSize(9);
     sheet.getRange(emptyRow, 1, 1, rowValues.length).setBorder(true, true, true, true, true, true, "#334155", SpreadsheetApp.BorderStyle.SOLID);

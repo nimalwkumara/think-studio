@@ -999,10 +999,10 @@
                 <input type="number" id="slipAmount" required placeholder="Amount Transferred (Rs.)" class="input-dark">
                 <input type="text" id="slipRef" required placeholder="Bank Reference Code" class="input-dark">
                 <div class="p-3 rounded-xl bg-white/3 border border-white/6 border-dashed text-center cursor-pointer hover:bg-white/6 transition-all">
-                  <input type="file" id="slipFile" accept="image/*,.pdf" required class="hidden">
+                  <input type="file" id="slipFile" accept="image/*,.pdf" required class="hidden" onchange="updateSlipFileName(this)">
                   <label for="slipFile" class="cursor-pointer block">
-                    <div class="text-2xl mb-1"></div>
-                    <div class="text-xs text-slate-400">Click to attach payment slip (image/PDF)</div>
+                    <div class="text-2xl mb-1">📄</div>
+                    <div id="slipFileLabel" class="text-xs text-slate-400">Click to attach payment slip (image/PDF)</div>
                   </label>
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl gold-gradient-bg text-black font-bold text-xs uppercase hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all">Submit Slip for Verification</button>
@@ -1831,14 +1831,24 @@
     function saveState(s) { localStorage.setItem('THINK_STUDIO_STATE', JSON.stringify(s)); }
     let state = loadState();
 
+    function getAuthHeaders(extra = {}) {
+      const token = localStorage.getItem('THINK_STUDIO_AUTH_TOKEN');
+      const h = { 'Content-Type': 'application/json', ...extra };
+      if (token) h['Authorization'] = `Bearer ${token}`;
+      return h;
+    }
+
     async function syncWithDatabase() {
       try {
-        const res = await fetch('/api/state');
+        const headers = getAuthHeaders();
+        const res = await fetch('/api/state', { headers });
         if (res.ok) {
           const dbData = await res.json();
-          if (dbData.users && dbData.users.length) state.users = dbData.users;
+          if (dbData.users) state.users = dbData.users;
+          if (dbData.currentUser) state.currentUser = dbData.currentUser;
           if (dbData.bookings) state.bookings = dbData.bookings;
           if (dbData.pendingSlips) state.pendingSlips = dbData.pendingSlips;
+          if (dbData.allPayments) state.allPayments = dbData.allPayments;
           if (dbData.reviews) state.reviews = dbData.reviews;
           if (dbData.studioBank) state.studioBank = dbData.studioBank;
           if (dbData.googleSheetWebhook) {
@@ -1855,12 +1865,21 @@
           }
           
           if (state.currentUser) {
-            state.currentUser = state.users.find(u => u.email === state.currentUser.email) || state.currentUser;
+            if (state.currentUser.role === 'customer' && dbData.currentUser) {
+              state.currentUser = dbData.currentUser;
+            } else if (state.users && state.users.length) {
+              state.currentUser = state.users.find(u => u.email.toLowerCase() === state.currentUser.email.toLowerCase()) || state.currentUser;
+            }
           }
           saveState(state);
           renderApp();
           initGoogleSignIn();
           setDbStatus(true, dbData.databaseType);
+        } else if (res.status === 401) {
+          localStorage.removeItem('THINK_STUDIO_AUTH_TOKEN');
+          state.currentUser = null;
+          saveState(state);
+          renderApp();
         }
       } catch (err) {
         console.log("Using local offline store", err);
@@ -1974,7 +1993,31 @@
       else { navigateTo('user'); openBookingModal('Book with Package Hours'); }
     }
 
-    function quickLogin(role) {
+    async function quickLogin(role) {
+      const email = role === 'admin' ? 'thinkstudiocontact@gmail.com' : 'dr.rajesh@gmail.com';
+      const password = role === 'admin' ? 'thinkadmin2026' : 'password123';
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          localStorage.setItem('THINK_STUDIO_AUTH_TOKEN', data.token);
+          state.currentUser = data.user;
+          saveState(state);
+          closeAuthModal();
+          await syncWithDatabase();
+          if (role === 'admin') navigateTo('admin');
+          else navigateTo('user');
+          showDbToast(`✓ Signed in as ${role === 'admin' ? 'Studio Administrator' : data.user.name}`);
+          return;
+        }
+      } catch (err) {
+        console.warn("Backend auth offline, using local fallback", err);
+      }
+      // Offline fallback
       if (role === 'customer') {
         state.currentUser = state.users.find(u => u.email === 'dr.rajesh@gmail.com');
         saveState(state); renderApp(); navigateTo('user');
@@ -1986,7 +2029,13 @@
     }
 
     function handleLogout() {
-      state.currentUser = null; saveState(state); renderApp(); navigateTo('public');
+      localStorage.removeItem('THINK_STUDIO_AUTH_TOKEN');
+      state.currentUser = null;
+      saveState(state);
+      renderApp();
+      syncWithDatabase();
+      navigateTo('public');
+      showDbToast("✓ Logged out successfully");
     }
 
     function openAuthModal(t = 'login') {
@@ -2008,35 +2057,89 @@
       }
     }
 
-    function handleLoginSubmit(e) {
+    async function handleLoginSubmit(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-      let found = state.users.find(u => u.email.toLowerCase() === email);
-      if (!found && (email === 'admin@thinkstudio.com' || email === 'thinkstudiocontact@gmail.com' || email.includes('admin'))) {
-        found = state.users.find(u => u.role === 'admin');
+      const password = document.getElementById('loginPass').value.trim();
+      if (!email || !password) {
+        alert("Please enter both your email address and password.");
+        return;
       }
-      if (found) {
-        state.currentUser = found; saveState(state); renderApp(); closeAuthModal();
-        if (found.role === 'admin') navigateTo('admin'); else navigateTo('user');
-      } else alert("User not found. Use Demo button or dr.rajesh@gmail.com / thinkstudiocontact@gmail.com");
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          alert(data.error || "Authentication failed: Invalid email or password. Please verify your credentials.");
+          return;
+        }
+        localStorage.setItem('THINK_STUDIO_AUTH_TOKEN', data.token);
+        state.currentUser = data.user;
+        saveState(state);
+        closeAuthModal();
+        await syncWithDatabase();
+        if (data.user.role === 'admin') navigateTo('admin');
+        else navigateTo('user');
+        showDbToast(`✓ Welcome back, ${data.user.name}!`);
+      } catch (err) {
+        console.error("Login request failed:", err);
+        alert("Unable to reach the authentication server. Please check that server.py is running.");
+      }
     }
 
-    function handleRegisterSubmit(e) {
+    async function handleRegisterSubmit(e) {
       e.preventDefault();
-      const user = {
-        id: "u-" + Date.now(), name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
-        phone: document.getElementById('regPhone').value, role: "customer",
-        package: { name: "Monthly Package", cost: 12000, totalHours: 20, usedHours: 0, remainingHours: 20, startDate: "2026-09-28", endDate: "2026-10-28" },
-        payments: [], balanceDue: 12000
-      };
-      state.users.push(user); state.currentUser = user; saveState(state); renderApp(); closeAuthModal(); navigateTo('user');
-      syncUserToGoogleSheet(user);
-      fetch('/api/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-      }).catch(err => console.warn("DB offline", err));
-      showDbToast("✓ Account created & synced to Google Sheet!");
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const password = document.getElementById('regPass').value.trim();
+
+      if (!name || !email || !password) {
+        alert("Please provide your full name, email, and a secure password.");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, password })
+        });
+        const data = await res.json();
+        if (res.status === 409 || !res.ok) {
+          alert(data.error || "This email is already registered. Please login or use a different email address.");
+          switchAuthTab('login');
+          document.getElementById('loginEmail').value = email;
+          return;
+        }
+
+        // Auto-login newly registered user
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const loginData = await loginRes.json();
+        if (loginRes.ok && loginData.success) {
+          localStorage.setItem('THINK_STUDIO_AUTH_TOKEN', loginData.token);
+          state.currentUser = loginData.user;
+          saveState(state);
+          closeAuthModal();
+          await syncWithDatabase();
+          navigateTo('user');
+          showDbToast(`✓ Account created & Monthly package assigned!`);
+        } else {
+          alert("Account registered successfully! Please log in with your credentials.");
+          switchAuthTab('login');
+          document.getElementById('loginEmail').value = email;
+        }
+      } catch (err) {
+        console.error("Registration error:", err);
+        alert("Registration failed. Please verify your connection.");
+      }
     }
 
     // ==================== GOOGLE SIGN-IN & IDENTITY SERVICES ====================
@@ -2171,6 +2274,9 @@
           const resData = await res.json();
           if (resData.success && resData.user) {
             const user = resData.user;
+            if (resData.token) {
+              localStorage.setItem('THINK_STUDIO_AUTH_TOKEN', resData.token);
+            }
             const idx = state.users.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
             if (idx >= 0) {
               state.users[idx] = { ...state.users[idx], ...user };
@@ -2181,7 +2287,7 @@
             saveState(state);
             closeAuthModal();
             closeGooglePromptModal();
-            renderApp();
+            await syncWithDatabase();
             showDbToast(`✓ Welcome to Think Studio, ${user.name}!`);
             if (user.role === 'admin') navigateTo('admin');
             else navigateTo('user');
@@ -2195,7 +2301,7 @@
       // Offline fallback
       let user = state.users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
       if (!user) {
-        const isAdmin = userData.email.toLowerCase() === 'thinkstudiocontact@gmail.com' || userData.email.toLowerCase().includes('admin');
+        const isAdmin = userData.email.toLowerCase() === 'thinkstudiocontact@gmail.com' || userData.email.toLowerCase() === 'admin@thinkstudio.com';
         const nowStr = new Date().toISOString().split('T')[0];
         const nextMonth = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
         user = {
@@ -2241,7 +2347,7 @@
       try {
         const res = await fetch('/api/settings/google-auth', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ googleClientId: clientId })
         });
         if (res.ok) {
@@ -2515,10 +2621,20 @@
         sel.innerHTML = customers.map(u => `<option value="${u.email}">${u.name}</option>`).join('');
       }
 
-      document.getElementById('adminPendingSlipsList').innerHTML = state.pendingSlips.map(s => `
+      document.getElementById('adminPendingSlipsList').innerHTML = state.pendingSlips.map(s => {
+        const slipUrl = s.slipFilename || s.slip_filename || '';
+        const viewLink = slipUrl ? `
+          <a href="${slipUrl}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#D4AF37] border border-[#D4AF37]/30 text-xs font-semibold inline-flex items-center gap-1 transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            View Slip
+          </a>` : '';
+        return `
         <div class="p-4 rounded-xl bg-black/30 border border-[#D4AF37]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span class="font-bold text-white">${s.userName}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white">${s.userName}</span>
+              ${viewLink}
+            </div>
             <span class="text-slate-400 text-[11px] block font-mono mt-0.5">Ref: ${s.ref} • ${s.method || 'Bank Transfer'} • ${s.date}</span>
           </div>
           <div class="flex items-center gap-2">
@@ -2527,7 +2643,8 @@
             <button onclick="adminRejectSlip('${s.id}')" class="px-3.5 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/25 text-xs transition-all">✕ Reject</button>
           </div>
         </div>
-      `).join('') || `<div class="p-8 text-center text-slate-500">
+      `;
+      }).join('') || `<div class="p-8 text-center text-slate-500">
           <svg class="w-8 h-8 mx-auto text-emerald-500/50 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <div class="text-xs text-slate-400">All payment slips verified. Zero pending.</div>
         </div>`;
@@ -2706,7 +2823,7 @@
       try {
         await fetch('/api/settings/google-sheet', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ webhookUrl: url })
         });
       } catch (err) {
@@ -2811,9 +2928,22 @@
     }
 
     // Zoom Helpers
-    function autoGenerateZoomLink() {
-      const randId = Math.floor(10000000000 + Math.random() * 90000000000);
-      document.getElementById('bkgZoomLink').value = `https://zoom.us/j/${randId}?pwd=THINKSTUDIO2026`;
+    async function autoGenerateZoomLink() {
+      try {
+        const res = await fetch('/api/zoom/generate');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.zoomLink) {
+            document.getElementById('bkgZoomLink').value = data.zoomLink;
+            showDbToast("✓ Verified Studio Zoom room attached!");
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Zoom generator offline:", err);
+      }
+      document.getElementById('bkgZoomLink').value = "https://us05web.zoom.us/j/84523194022?pwd=THINKSTUDIO2026";
+      showDbToast("✓ Verified Studio Zoom room attached!");
     }
 
     function handleGearChange(val) {
@@ -2903,7 +3033,7 @@
       try {
         await fetch('/api/bookings/update-zoom', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ bookingId: bId, zoomLink: zoomUrl, meetingId: zoomId, passcode: zoomPass })
         });
         showDbToast("✓ Zoom link saved to SQLite Database (think_studio.db)!");
@@ -2930,7 +3060,7 @@
       try {
         await fetch('/api/bookings/update-zoom', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ bookingId: 'all', zoomLink: zoomUrl, meetingId: zoomId, passcode: zoomPass })
         });
         showDbToast("✓ Universal Zoom meeting link saved in SQLite DB!");
@@ -2957,16 +3087,16 @@
       if (!state.currentUser) { closeBookingModal(); openAuthModal('register'); return; }
       const dur = parseInt(document.getElementById('bkgDuration').value);
       const gear = document.getElementById('bkgGear').value;
-      const zoomLink = document.getElementById('bkgZoomLink').value || (gear.includes("Zoom") ? "https://zoom.us/j/84523194022?pwd=THINKSTUDIO2026" : "");
-      const bkgTopic = document.getElementById('bkgTopic').value;
+      const zoomLink = document.getElementById('bkgZoomLink').value || (gear.includes("Zoom") ? "https://us05web.zoom.us/j/84523194022?pwd=THINKSTUDIO2026" : "");
+      const bkgTopic = document.getElementById('bkgTopic').value.trim();
       const bkgDate = document.getElementById('bkgDate').value;
       const bkgSlot = document.getElementById('bkgSlot').value;
 
-      if (state.currentUser.role === 'customer') {
-        if (state.currentUser.package.remainingHours < dur) { alert("Insufficient hours in package!"); return; }
-        state.currentUser.package.remainingHours -= dur;
-        state.currentUser.package.usedHours += dur;
-        state.deductions.unshift({ date: bkgDate, topic: bkgTopic, hours: dur, tech: "Assigned", status: "Scheduled" });
+      if (state.currentUser.role === 'customer' && state.currentUser.package) {
+        if (state.currentUser.package.remainingHours < dur) {
+          alert(`Insufficient package hours! You have ${state.currentUser.package.remainingHours} hours remaining, but this session requires ${dur} hours. Please recharge your package first.`);
+          return;
+        }
       }
 
       const bookingObj = {
@@ -2984,42 +3114,46 @@
         status: "Confirmed"
       };
 
-      state.bookings.unshift(bookingObj);
-      saveState(state);
-      renderApp();
-      closeBookingModal();
-
       try {
-        await fetch('/api/bookings/create', {
+        const res = await fetch('/api/bookings/create', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(bookingObj)
         });
-        showDbToast("✓ Booking and Zoom link saved in SQLite Database!");
+        const data = await res.json();
+        if (res.status === 409) {
+          alert(data.error || "Conflict: This time slot is already booked for another session. Please select a different time slot or date.");
+          return;
+        }
+        if (!res.ok) {
+          alert(data.error || "Failed to create booking.");
+          return;
+        }
+        closeBookingModal();
+        showDbToast("✓ Booking and verified Zoom link scheduled in SQLite Database!");
+        await syncWithDatabase();
       } catch (err) {
-        console.warn("DB offline", err);
+        console.warn("Booking request error:", err);
+        alert("Booking failed. Please check your connection.");
       }
     }
 
     async function cancelBooking(id) {
       const idx = state.bookings.findIndex(b => b.id === id);
       if (idx !== -1 && confirm("Cancel this studio session? Your package hours will be refunded.")) {
-        const b = state.bookings[idx];
-        if (state.currentUser && state.currentUser.role === 'customer') {
-          state.currentUser.package.remainingHours += b.duration;
-          state.currentUser.package.usedHours = Math.max(0, state.currentUser.package.usedHours - b.duration);
-        }
-        state.bookings.splice(idx, 1);
-        saveState(state);
-        renderApp();
-
         try {
-          await fetch('/api/bookings/cancel', {
+          const res = await fetch('/api/bookings/cancel', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ bookingId: id, restoreHours: true })
           });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.error || "Failed to cancel booking.");
+            return;
+          }
           showDbToast("✓ Booking cancelled & hours restored in SQLite database!");
+          await syncWithDatabase();
         } catch (err) {
           console.warn("DB offline", err);
         }
@@ -3029,17 +3163,19 @@
     async function markBookingCompleted(id) {
       const b = state.bookings.find(bk => bk.id === id);
       if (b) {
-        b.status = "Completed";
-        saveState(state);
-        renderApp();
-
         try {
-          await fetch('/api/bookings/complete', {
+          const res = await fetch('/api/bookings/complete', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ bookingId: id })
           });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.error || "Failed to complete booking.");
+            return;
+          }
           showDbToast(`✓ Session ${id} marked as Completed in SQLite DB!`);
+          await syncWithDatabase();
         } catch (err) {
           console.warn("DB offline", err);
         }
@@ -3048,31 +3184,61 @@
 
     async function adminCancelBooking(id) {
       if (confirm("Cancel this booking from the studio schedule?")) {
-        const idx = state.bookings.findIndex(bk => bk.id === id);
-        if (idx !== -1) {
-          state.bookings.splice(idx, 1);
-          saveState(state);
-          renderApp();
-
-          try {
-            await fetch('/api/bookings/cancel', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ bookingId: id, restoreHours: true })
-            });
-            showDbToast("✓ Booking removed and hours refunded in SQLite database!");
-          } catch (err) {
-            console.warn("DB offline", err);
+        try {
+          const res = await fetch('/api/bookings/cancel', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ bookingId: id, restoreHours: true })
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.error || "Failed to remove booking.");
+            return;
           }
+          showDbToast("✓ Booking removed and hours refunded in SQLite database!");
+          await syncWithDatabase();
+        } catch (err) {
+          console.warn("DB offline", err);
         }
+      }
+    }
+
+    function updateSlipFileName(input) {
+      const label = document.getElementById('slipFileLabel');
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const sizeKb = Math.round(file.size / 1024);
+        label.innerHTML = `<span class="text-emerald-400 font-bold">${file.name}</span> <span class="text-slate-500">(${sizeKb} KB)</span>`;
+      } else if (label) {
+        label.textContent = "Click to attach payment slip (image/PDF)";
       }
     }
 
     // Slips & Payments (Connected to SQLite database think_studio.db)
     async function handleCustomerSlipUpload(e) {
       e.preventDefault();
+      if (!state.currentUser) {
+        alert("Please log in to upload a payment slip.");
+        return;
+      }
       const amount = parseInt(document.getElementById('slipAmount').value);
-      const ref = document.getElementById('slipRef').value;
+      const ref = document.getElementById('slipRef').value.trim();
+      const fileInput = document.getElementById('slipFile');
+      const file = fileInput.files && fileInput.files[0];
+
+      if (!file) {
+        alert("Please select a bank slip file (image or PDF) to upload.");
+        return;
+      }
+
+      // Convert file to Base64 data URL
+      const fileData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+
       const slipObj = {
         id: "SLIP-" + Date.now(),
         userEmail: state.currentUser.email,
@@ -3081,71 +3247,78 @@
         ref: ref,
         date: new Date().toISOString().split('T')[0],
         status: "Pending Verification",
-        method: "People's Bank Godakawela"
+        method: "People's Bank Godakawela",
+        fileName: file.name,
+        fileData: fileData
       };
-      state.pendingSlips.unshift(slipObj);
-      saveState(state);
-      renderApp();
-      document.getElementById('slipSuccessMsg').classList.remove('hidden');
 
       try {
-        await fetch('/api/payments', {
+        const res = await fetch('/api/payments', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(slipObj)
         });
-        showDbToast(`✓ Payment slip saved in SQLite DB (Ref: ${ref})!`);
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to upload payment slip.");
+          return;
+        }
+
+        document.getElementById('slipAmount').value = '';
+        document.getElementById('slipRef').value = '';
+        fileInput.value = '';
+        const fileLabel = document.getElementById('slipFileLabel');
+        if (fileLabel) fileLabel.textContent = "Click to attach payment slip (image/PDF)";
+
+        const successMsg = document.getElementById('slipSuccessMsg');
+        if (successMsg) {
+          successMsg.classList.remove('hidden');
+          setTimeout(() => successMsg.classList.add('hidden'), 4000);
+        }
+        showDbToast(`✓ Payment slip saved to server & DB (Ref: ${ref})!`);
+        await syncWithDatabase();
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("Error uploading payment slip. Please check your connection.");
+      }
+    }
+
+    async function adminApproveSlip(id) {
+      try {
+        const res = await fetch('/api/payments/verify', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ slipId: id })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to verify payment slip.");
+          return;
+        }
+        showDbToast(`✓ Payment ${id} verified & balance updated!`);
+        await syncWithDatabase();
       } catch (err) {
         console.warn("DB offline", err);
       }
     }
 
-    async function adminApproveSlip(id) {
-      const idx = state.pendingSlips.findIndex(s => s.id === id);
-      if (idx !== -1) {
-        const s = state.pendingSlips[idx];
-        const u = state.users.find(x => x.email === s.userEmail);
-        if (u) {
-          const payRecord = { id: "P-" + Date.now(), date: s.date, ref: s.ref, method: s.method || "People's Bank Transfer", amount: s.amount, status: "Verified" };
-          u.payments.push(payRecord);
-          u.balanceDue = Math.max(0, u.balanceDue - s.amount);
-          syncUserToGoogleSheet(u, payRecord);
-        }
-        state.pendingSlips.splice(idx, 1);
-        saveState(state);
-        renderApp();
-
-        try {
-          await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slipId: id })
-          });
-          showDbToast(`✓ Payment ${id} verified in SQLite DB & synced to Google Sheet!`);
-        } catch (err) {
-          console.warn("DB offline", err);
-        }
-      }
-    }
-
     async function adminRejectSlip(id) {
       if (!confirm("Reject and dismiss this payment slip?")) return;
-      const idx = state.pendingSlips.findIndex(s => s.id === id);
-      if (idx !== -1) {
-        state.pendingSlips.splice(idx, 1);
-        saveState(state);
-        renderApp();
-
-        try {
-          await fetch('/api/payments/reject', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slipId: id })
-          });
-          showDbToast(`✓ Slip ${id} rejected & dismissed.`);
-        } catch (err) {
-          console.warn("DB offline", err);
+      try {
+        const res = await fetch('/api/payments/reject', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ slipId: id })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to reject slip.");
+          return;
         }
+        showDbToast(`✓ Slip ${id} rejected & dismissed.`);
+        await syncWithDatabase();
+      } catch (err) {
+        console.warn("DB offline", err);
       }
     }
 
@@ -3153,24 +3326,23 @@
       e.preventDefault();
       const val = parseInt(document.getElementById('adminAdjustHoursVal').value);
       const userEmail = document.getElementById('adminAdjustUserSelect').value;
-      const u = state.users.find(x => x.email === userEmail);
-      if (u) {
-        u.package.remainingHours += val;
-        u.package.totalHours += val;
-        syncUserToGoogleSheet(u);
-        saveState(state);
-        renderApp();
+      if (!userEmail) return;
 
-        try {
-          await fetch('/api/users/adjust-hours', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userEmail: userEmail, delta: val })
-          });
-          showDbToast(`✓ Hours updated in SQLite Database (${val > 0 ? '+' + val : val}h) & synced to Google Sheet!`);
-        } catch (err) {
-          console.warn("DB offline", err);
+      try {
+        const res = await fetch('/api/users/adjust-hours', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ userEmail: userEmail, delta: val })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to adjust hours.");
+          return;
         }
+        showDbToast(`✓ ${val >= 0 ? '+' : ''}${val} hours updated in SQLite DB & synced to Google Sheet!`);
+        await syncWithDatabase();
+      } catch (err) {
+        console.warn("DB offline", err);
       }
     }
 
@@ -3192,18 +3364,18 @@
         featured: false,
         status: "Approved"
       };
-      state.reviews.unshift(revObj);
-      saveState(state);
-      renderApp();
-      closeReviewModal();
-      showDbToast("✓ Thank you! Review saved in SQLite database!");
 
       try {
-        await fetch('/api/reviews', {
+        const res = await fetch('/api/reviews', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(revObj)
         });
+        if (res.ok) {
+          closeReviewModal();
+          showDbToast("✓ Thank you! Review saved in SQLite database!");
+          await syncWithDatabase();
+        }
       } catch (err) {
         console.warn("DB offline", err);
       }
@@ -3214,21 +3386,19 @@
       if (!state.currentUser) return;
       const name = document.getElementById('profName').value.trim();
       const phone = document.getElementById('profPhone').value.trim();
-      state.currentUser.name = name;
-      state.currentUser.phone = phone;
-      saveState(state);
-      renderApp();
-
-      const msg = document.getElementById('profSavedMsg');
-      if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3000); }
-      showDbToast("✓ Profile updated in SQLite DB & synced to Google Sheet!");
 
       try {
-        await fetch('/api/users/update-profile', {
+        const res = await fetch('/api/users/update-profile', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ email: state.currentUser.email, name: name, phone: phone })
         });
+        if (res.ok) {
+          const msg = document.getElementById('profSavedMsg');
+          if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3000); }
+          showDbToast("✓ Profile updated in SQLite DB & synced to Google Sheet!");
+          await syncWithDatabase();
+        }
       } catch (err) {
         console.warn("DB offline", err);
       }
@@ -3244,20 +3414,22 @@
         phone: "0702663137",
         email: "thinkstudiocontact@gmail.com"
       };
-      state.studioBank = bankData;
-      saveState(state);
-      renderApp();
-
-      const msg = document.getElementById('adminBankSavedMsg');
-      if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3500); }
-      showDbToast("✓ Studio bank details saved in SQLite database!");
 
       try {
-        await fetch('/api/settings/studio-bank', {
+        const res = await fetch('/api/settings/studio-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify(bankData)
         });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Unauthorized: Administrator credentials required.");
+          return;
+        }
+        const msg = document.getElementById('adminBankSavedMsg');
+        if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3500); }
+        showDbToast("✓ Studio bank details saved in SQLite database!");
+        await syncWithDatabase();
       } catch (err) {
         console.warn("DB offline", err);
       }

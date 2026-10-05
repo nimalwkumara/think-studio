@@ -22,7 +22,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('✨ Think Studio')
     .addItem('🌟 Load Real Data (Kavindya, Menuka & Janith)', 'loadRealData')
-    .addItem('📌 Update Menuka Today Session (3.5h • Rs. 4,500 Unpaid)', 'updateMenukaTodaySession')
+    .addItem('📌 Add Menuka Today Session (3.5h • Rs. 4,500 as Row 7)', 'addMenukaTodaySessionRow')
     .addItem('🎨 Setup & Format Dashboard', 'setupThinkStudioDashboard')
     .addSeparator()
     .addItem('🔄 Recalculate Financials', 'recalculateFinancials')
@@ -418,12 +418,22 @@ function upsertCustomerRow(sheet, data) {
   const existingIds = sheet.getRange(4, 2, lastRow - 3, 1).getValues();
 
   let targetRow = -1;
-  for (let i = 0; i < existingEmails.length; i++) {
-    const curEmail = existingEmails[i][0].toString().trim().toLowerCase();
-    const curId = existingIds[i][0].toString().trim();
-    if ((email && curEmail === email) || (userId && curId === userId)) {
-      targetRow = i + 4; // 1-indexed, starting at row 4
-      break;
+  // If userId is provided, match by userId first (allows separate session rows for the same customer)
+  if (userId) {
+    for (let i = 0; i < existingIds.length; i++) {
+      const curId = existingIds[i][0].toString().trim();
+      if (curId === userId) {
+        targetRow = i + 4;
+        break;
+      }
+    }
+  } else if (email) {
+    for (let i = 0; i < existingEmails.length; i++) {
+      const curEmail = existingEmails[i][0].toString().trim().toLowerCase();
+      if (curEmail === email) {
+        targetRow = i + 4;
+        break;
+      }
     }
   }
 
@@ -704,21 +714,21 @@ function loadRealData() {
     timestamp: "2026-09-26 18:00"
   });
 
-  // 2. Menuka Wijebandara (Package: Hourly Flex (2h @ Rs. 3,000). Prev paid 7000, today 3.5h @ 4500 unpaid. Total fee = Rs. 15,500, Balance due = Rs. 8,500)
+  // 2. Menuka Wijebandara (Session 1: 2026-09-21 - Package: Hourly Flex (2h @ Rs. 3,000). Total fee = Rs. 11,000, Paid = Rs. 7,000, Balance due = Rs. 4,000)
   upsertCustomerRow(sheet, {
     id: "u-menuka",
     name: "Menuka Wijebandara",
     email: "menuka.wijebandara@gmail.com",
     phone: "0771234567",
     packageName: "Hourly Flex (2h @ Rs. 3,000)",
-    packagePrice: 15500,
+    packagePrice: 11000,
     paidAmount: 7000,
-    balanceDue: 8500,
-    totalHours: 11.5,
-    usedHours: 6.5,
-    remainingHours: 5.0,
+    balanceDue: 4000,
+    totalHours: 8,
+    usedHours: 3,
+    remainingHours: 5,
     status: "Active",
-    timestamp: "2026-10-05 15:52"
+    timestamp: "2026-09-21 11:30"
   });
 
   // 3. Janith Mihira (One-time recording session: Rs. 2,000 to collect)
@@ -738,6 +748,23 @@ function loadRealData() {
     timestamp: "2026-09-29 14:00"
   });
 
+  // 4. Menuka Wijebandara (Session 2: Today 2026-10-05 - 3.5 Hours, Fee = Rs. 4,500, Paid = Rs. 0, Balance due = Rs. 4,500)
+  upsertCustomerRow(sheet, {
+    id: "u-menuka-oct05",
+    name: "Menuka Wijebandara",
+    email: "menuka.wijebandara@gmail.com",
+    phone: "0771234567",
+    packageName: "Hourly Flex (2h @ Rs. 3,000) • 3.5h Session",
+    packagePrice: 4500,
+    paidAmount: 0,
+    balanceDue: 4500,
+    totalHours: 3.5,
+    usedHours: 3.5,
+    remainingHours: 0.0,
+    status: "Active",
+    timestamp: "2026-10-05 15:52"
+  });
+
   // Populate verified bank payments into Side Table 2
   const realPayments = [
     ["2026-09-26", "Kavindya Kodithuwakku", 15000, "PB-KAV-15000", "People's Bank Godakawela", "Verified"],
@@ -748,33 +775,32 @@ function loadRealData() {
   sheet.getRange("Q19:Q20").setNumberFormat("[$Rs. ]#,##0.00").setFontColor("#34D399").setFontWeight("bold");
 
   recalculateFinancials();
-  SpreadsheetApp.getActiveSpreadsheet().toast("✓ Real Customer Data Loaded: Kavindya, Menuka & Janith!", "Think Studio", 5);
+  SpreadsheetApp.getActiveSpreadsheet().toast("✓ Real Customer Data Loaded: Kavindya, Menuka (2 sessions) & Janith!", "Think Studio", 5);
 }
 
 /**
- * Specifically update Menuka Wijebandara with Today's 3.5h Session (Rs. 4,500 Unpaid)
- * Directly updates Row 5 in Google Sheet!
+ * Specifically add Menuka Wijebandara Today 3.5h Session as a SEPARATE ROW (Row 7)
  */
-function updateMenukaTodaySession() {
+function addMenukaTodaySessionRow() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME) || setupThinkStudioDashboard();
 
   upsertCustomerRow(sheet, {
-    id: "u-menuka",
+    id: "u-menuka-oct05",
     name: "Menuka Wijebandara",
     email: "menuka.wijebandara@gmail.com",
     phone: "0771234567",
-    packageName: "Hourly Flex (2h @ Rs. 3,000)",
-    packagePrice: 15500,
-    paidAmount: 7000,
-    balanceDue: 8500,
-    totalHours: 11.5,
-    usedHours: 6.5,
-    remainingHours: 5.0,
+    packageName: "Hourly Flex (2h @ Rs. 3,000) • 3.5h Session",
+    packagePrice: 4500,
+    paidAmount: 0,
+    balanceDue: 4500,
+    totalHours: 3.5,
+    usedHours: 3.5,
+    remainingHours: 0.0,
     status: "Active",
     timestamp: Utilities.formatDate(new Date(), "Asia/Colombo", "yyyy-MM-dd HH:mm")
   });
 
   recalculateFinancials();
-  SpreadsheetApp.getActiveSpreadsheet().toast("✓ Menuka Wijebandara Updated: Today 3.5h added! Balance Due: Rs. 8,500", "Think Studio", 5);
+  SpreadsheetApp.getActiveSpreadsheet().toast("✓ Menuka Today 3.5h Session Added as Separate Row (Row 7)! Balance: Rs. 4,500", "Think Studio", 5);
 }

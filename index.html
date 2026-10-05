@@ -1286,6 +1286,22 @@
 
             <!-- ADMIN TAB: PAYMENTS -->
             <div id="aTab-payments" class="hidden space-y-6 fade-in">
+              <!-- Top Action Header -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl card-gold-3d">
+                <div>
+                  <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#D4AF37] animate-pulse"></span>
+                    <span>Financial Management & Payments (ගෙවීම් කළමනාකරණය)</span>
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-1">නව ගෙවීම් ඇතුළත් කිරීම, Paid / Unpaid තත්ත්වය සටහන් කිරීම සහ Live Google Sheet Sync කිරීම</p>
+                </div>
+                <button onclick="openRecordPaymentModal()" class="px-5 py-2.5 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs shadow hover:shadow-[0_0_24px_rgba(212,175,55,0.4)] transition-all flex items-center gap-2 shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  <span>Record Payment (ගෙවීමක් එක් කරන්න)</span>
+                </button>
+              </div>
+
+              <!-- Pending Slip Approvals -->
               <div class="card-gold-3d rounded-2xl p-6 space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <h3 class="text-sm font-bold text-white">Pending Slip Approvals</h3>
@@ -1293,11 +1309,16 @@
                 </div>
                 <div id="adminPendingSlipsList" class="space-y-2"></div>
               </div>
+
+              <!-- All Payments Ledger Table -->
               <div>
-                <h3 class="text-sm font-bold text-white mb-3">All Payments Ledger</h3>
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-bold text-white">All Payments Ledger & Live Status</h3>
+                  <span class="text-[11px] text-slate-400">Click any status badge to toggle Paid / Unpaid live!</span>
+                </div>
                 <div class="overflow-x-auto rounded-2xl card-3d border-0">
                   <table class="data-table">
-                    <thead><tr><th>Date</th><th>Customer</th><th>Reference #</th><th>Method</th><th>Amount</th><th class="text-right">Status</th></tr></thead>
+                    <thead><tr><th>Date</th><th>Customer</th><th>Reference #</th><th>Method</th><th>Amount</th><th>Status (Live Toggle)</th><th class="text-right">Actions</th></tr></thead>
                     <tbody id="adminAllPaymentsTableBody" class="divide-y divide-white/4"></tbody>
                   </table>
                 </div>
@@ -1576,6 +1597,98 @@
           <div><label class="text-[10px] font-mono text-slate-500 uppercase block mb-1">Passcode</label><input type="text" id="adminZoomPass" required class="input-dark font-mono"></div>
         </div>
         <button type="submit" class="w-full py-3 rounded-xl text-xs font-bold uppercase bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 transition-all">Save & Update Customer Portal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN RECORD PAYMENT MODAL ==================== -->
+  <div id="adminPaymentModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="card-gold-3d rounded-3xl p-6 sm:p-8 max-w-lg w-full relative max-h-[92vh] overflow-y-auto border border-[#D4AF37]/30 shadow-[0_0_50px_rgba(212,175,55,0.2)]">
+      <button onclick="closeAdminPaymentModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">✕</button>
+      
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white">Record Customer Payment</h3>
+          <p class="text-xs text-slate-400">ගෙවීම් ඇතුළත් කිරීම සහ Live Google Sheet යාවත්කාලීන කිරීම</p>
+        </div>
+      </div>
+
+      <form id="adminPaymentForm" onsubmit="handleRecordPaymentSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Customer / Client (පාරිභෝගිකයා) *</label>
+          <select id="payCustomerSelect" onchange="onPaymentCustomerChange(this.value)" class="input-dark w-full py-2.5 px-3 text-xs" required>
+            <option value="">-- Select Customer --</option>
+          </select>
+        </div>
+
+        <div id="payCustomerDueBanner" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between text-xs">
+          <span class="text-amber-300">Outstanding Balance Due:</span>
+          <span id="payCustomerDueAmount" class="font-bold font-mono text-amber-400">Rs. 0.00</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Amount (ගෙවූ මුදල Rs.) *</label>
+            <input type="number" id="payAmountInput" min="1" step="1" placeholder="4500" class="input-dark w-full py-2 px-3 text-xs font-mono font-bold text-emerald-400" required>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Payment Date (දිනය) *</label>
+            <input type="date" id="payDateInput" class="input-dark w-full py-2 px-3 text-xs" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Payment Method (ක්‍රමය)</label>
+            <select id="payMethodInput" class="input-dark w-full py-2 px-3 text-xs">
+              <option value="People's Bank Godakawela">People's Bank Godakawela</option>
+              <option value="Online Bank Transfer">Online Bank Transfer</option>
+              <option value="Direct Cash Payment">Direct Cash Payment</option>
+              <option value="Commercial Bank">Commercial Bank</option>
+              <option value="HNB / Other Bank">HNB / Other Bank</option>
+              <option value="Bank Deposit Slip">Bank Deposit Slip</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Bank Ref / Slip #</label>
+            <input type="text" id="payRefInput" placeholder="PB-9984120 / CASH" class="input-dark w-full py-2 px-3 text-xs font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1.5">Payment Status (ගෙවීම් තත්ත්වය) *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/15 transition-all">
+              <input type="radio" name="payStatusOption" value="Verified" checked class="text-emerald-500 focus:ring-emerald-500">
+              <div>
+                <div class="text-emerald-400 font-bold text-xs">✓ Paid / Verified</div>
+                <div class="text-[10px] text-slate-400">ගෙවා ඇත (ශේෂයෙන් අඩු වේ)</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/15 transition-all">
+              <input type="radio" name="payStatusOption" value="Pending Verification" class="text-amber-500 focus:ring-amber-500">
+              <div>
+                <div class="text-amber-400 font-bold text-xs">⏳ Unpaid / Pending</div>
+                <div class="text-[10px] text-slate-400">තවම ලැබී නැත (බලාපොරොත්තුවෙන්)</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Notes / Description (විස්තරය)</label>
+          <input type="text" id="payNotesInput" placeholder="e.g. Studio Session 3.5h fee / Advance payment" class="input-dark w-full py-2 px-3 text-xs">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeAdminPaymentModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold">Cancel</button>
+          <button type="submit" id="btnSubmitPayment" class="px-5 py-2.5 rounded-xl gold-gradient-bg text-black font-bold uppercase text-xs shadow hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center gap-2">
+            <span>💾 Save & Live Sync</span>
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -2630,6 +2743,7 @@
           </td>
           <td class="p-3.5"><span class="${(u.balanceDue||0) > 0 ? 'badge-amber' : 'badge-green'} text-xs">Rs. ${(u.balanceDue || 0).toLocaleString()}</span></td>
           <td class="p-3.5 text-right">
+            <button onclick="openRecordPaymentModal('${u.email}')" class="px-2.5 py-1 rounded-lg bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#D4AF37] border border-[#D4AF37]/30 text-[10px] font-semibold transition-all mr-1.5">+ Pay</button>
             <button onclick="syncSingleUserToSheet('${u.email}')" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 text-[10px] font-mono transition-all">⚡ Sync</button>
           </td>
         </tr>
@@ -2740,16 +2854,31 @@
         </div>`;
 
       const allPayments = state.allPayments || (state.users ? state.users.flatMap(u => (u.payments || []).map(p => ({...p, userName: u.name}))) : []);
-      document.getElementById('adminAllPaymentsTableBody').innerHTML = allPayments.map(p => `
-        <tr>
+      document.getElementById('adminAllPaymentsTableBody').innerHTML = allPayments.map(p => {
+        const isPaid = (p.status === 'Verified' || p.status === 'Paid');
+        const nextStatus = isPaid ? 'Pending Verification' : 'Verified';
+        return `
+        <tr class="hover:bg-white/[0.02] transition-colors">
           <td class="p-3 font-mono text-slate-400 text-xs">${p.date}</td>
-          <td class="p-3 font-semibold text-white text-sm">${p.user_name || p.userName || 'Customer'}</td>
-          <td class="p-3 font-mono text-slate-400 text-xs">${p.ref}</td>
+          <td class="p-3">
+            <div class="font-semibold text-white text-sm">${p.user_name || p.userName || 'Customer'}</div>
+            <div class="text-[10px] text-slate-500 font-mono">${p.user_email || p.userEmail || ''}</div>
+          </td>
+          <td class="p-3 font-mono text-slate-400 text-xs">${p.ref || '—'}</td>
           <td class="p-3 text-slate-300 text-xs">${p.method || "People's Bank"}</td>
-          <td class="p-3 font-mono font-bold text-emerald-400">Rs. ${(p.amount || 0).toLocaleString()}</td>
-          <td class="p-3 text-right"><span class="badge-green">${p.status || 'Verified'}</span></td>
+          <td class="p-3 font-mono font-bold text-emerald-400 text-sm">Rs. ${(p.amount || 0).toLocaleString()}</td>
+          <td class="p-3">
+            <button onclick="togglePaymentStatus('${p.id}', '${nextStatus}')" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 ${isPaid ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25'}" title="Click to toggle status to ${nextStatus}">
+              <span>${isPaid ? '✓ Paid (Verified)' : '⏳ Unpaid / Pending'}</span>
+              <span class="text-[9px] opacity-60">⇄</span>
+            </button>
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="deletePaymentRecord('${p.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all text-xs" title="Delete record">🗑️</button>
+          </td>
         </tr>
-      `).join('') || `<tr><td colspan="6" class="p-10 text-center text-slate-500">
+      `;
+      }).join('') || `<tr><td colspan="7" class="p-10 text-center text-slate-500">
           <svg class="w-8 h-8 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           <div class="text-xs text-slate-400">No payment records found in ledger.</div>
         </td></tr>`;
@@ -3409,6 +3538,166 @@
         await syncWithDatabase();
       } catch (err) {
         console.warn("DB offline", err);
+      }
+    }
+
+    // ==========================================
+    // ADMIN RECORD PAYMENT & LIVE STATUS TOGGLE
+    // ==========================================
+    function openRecordPaymentModal(prefillEmail = '') {
+      const modal = document.getElementById('adminPaymentModal');
+      const sel = document.getElementById('payCustomerSelect');
+      const customers = state.users ? state.users.filter(u => u.role === 'customer') : [];
+      
+      sel.innerHTML = '<option value="">-- Select Customer --</option>' + 
+        customers.map(u => `<option value="${u.email}" data-due="${u.balanceDue || 0}" data-name="${u.name}">${u.name} (${u.email}) - Due: Rs. ${(u.balanceDue || 0).toLocaleString()}</option>`).join('');
+
+      if (prefillEmail) {
+        sel.value = prefillEmail;
+        onPaymentCustomerChange(prefillEmail);
+      } else {
+        document.getElementById('payCustomerDueBanner').classList.add('hidden');
+      }
+
+      document.getElementById('payAmountInput').value = '';
+      document.getElementById('payDateInput').value = new Date().toISOString().split('T')[0];
+      document.getElementById('payRefInput').value = 'PB-' + Date.now().toString().slice(-6);
+      document.getElementById('payNotesInput').value = '';
+      const verifiedRadio = document.querySelector('input[name="payStatusOption"][value="Verified"]');
+      if (verifiedRadio) verifiedRadio.checked = true;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeAdminPaymentModal() {
+      const modal = document.getElementById('adminPaymentModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function onPaymentCustomerChange(email) {
+      const banner = document.getElementById('payCustomerDueBanner');
+      const dueText = document.getElementById('payCustomerDueAmount');
+      const amountInput = document.getElementById('payAmountInput');
+
+      if (!email) {
+        banner.classList.add('hidden');
+        return;
+      }
+      const customer = (state.users || []).find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (customer && customer.balanceDue !== undefined) {
+        banner.classList.remove('hidden');
+        dueText.textContent = `Rs. ${(customer.balanceDue || 0).toLocaleString()}`;
+        if (customer.balanceDue > 0 && !amountInput.value) {
+          amountInput.value = customer.balanceDue;
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    async function handleRecordPaymentSubmit(e) {
+      e.preventDefault();
+      const sel = document.getElementById('payCustomerSelect');
+      const email = sel.value;
+      if (!email) {
+        alert("Please select a customer.");
+        return;
+      }
+      const opt = sel.options[sel.selectedIndex];
+      const name = opt ? opt.getAttribute('data-name') : 'Customer';
+      const amount = parseFloat(document.getElementById('payAmountInput').value);
+      const date = document.getElementById('payDateInput').value;
+      const method = document.getElementById('payMethodInput').value;
+      const ref = document.getElementById('payRefInput').value;
+      const statusRadio = document.querySelector('input[name="payStatusOption"]:checked');
+      const status = statusRadio ? statusRadio.value : 'Verified';
+      const notes = document.getElementById('payNotesInput').value;
+
+      const btn = document.getElementById('btnSubmitPayment');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin inline-block"></span><span>Saving & Syncing...</span>`;
+
+      try {
+        const res = await fetch('/api/payments/record', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            customerEmail: email,
+            customerName: name,
+            amount: amount,
+            date: date,
+            method: method,
+            ref: ref,
+            status: status,
+            notes: notes
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to record payment.");
+          btn.disabled = false;
+          btn.innerHTML = origText;
+          return;
+        }
+
+        closeAdminPaymentModal();
+        showDbToast(`✓ Payment of Rs. ${amount.toLocaleString()} recorded (${status}) & synced live!`);
+        await syncWithDatabase();
+      } catch (err) {
+        console.error("Error recording payment:", err);
+        alert("Network error recording payment.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    async function togglePaymentStatus(paymentId, newStatus) {
+      const isPaid = (newStatus === 'Verified');
+      const confirmMsg = isPaid
+        ? `Mark this payment as Paid / Verified? This will deduct the amount from the customer's balance and sync live to Google Sheet.`
+        : `Mark this payment as Unpaid / Pending? This will restore the amount to the customer's balance and sync live.`;
+      
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await fetch('/api/payments/toggle-status', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ paymentId, newStatus })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to update payment status.");
+          return;
+        }
+        showDbToast(`✓ Status updated to ${newStatus} & synced live!`);
+        await syncWithDatabase();
+      } catch (err) {
+        console.error("Error toggling payment status:", err);
+        alert("Network error updating status.");
+      }
+    }
+
+    async function deletePaymentRecord(paymentId) {
+      if (!confirm("Are you sure you want to delete this payment record? If it was marked as Verified, the customer's balance will be restored.")) return;
+
+      try {
+        const res = await fetch('/api/payments/delete', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ paymentId })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Failed to delete payment.");
+          return;
+        }
+        showDbToast("✓ Payment record deleted and balance restored.");
+        await syncWithDatabase();
+      } catch (err) {
+        console.error("Error deleting payment:", err);
       }
     }
 

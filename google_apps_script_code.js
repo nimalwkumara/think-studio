@@ -22,11 +22,12 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('✨ Think Studio')
     .addItem('🌟 Load Real Data (Kavindya, Menuka & Janith)', 'loadRealData')
+    .addItem('📌 Update Menuka Today Session (3.5h • Rs. 4,500 Unpaid)', 'updateMenukaTodaySession')
     .addItem('🎨 Setup & Format Dashboard', 'setupThinkStudioDashboard')
     .addSeparator()
+    .addItem('🔄 Recalculate Financials', 'recalculateFinancials')
     .addItem('🧪 Add Sample Data (නියැදි දත්ත)', 'addSampleData')
     .addItem('🧹 Clear Data (දත්ත ඉවත් කරන්න)', 'clearSampleData')
-    .addItem('🔄 Recalculate Financials', 'recalculateFinancials')
     .addToUi();
 }
 
@@ -703,21 +704,21 @@ function loadRealData() {
     timestamp: "2026-09-26 18:00"
   });
 
-  // 2. Menuka Wijebandara (Hourly: 2h @ 3000. Prev paid 7000, today 1h @ 1000 added. Total due = Rs. 4,000)
+  // 2. Menuka Wijebandara (Package: Hourly Flex (2h @ Rs. 3,000). Prev paid 7000, today 3.5h @ 4500 unpaid. Total fee = Rs. 15,500, Balance due = Rs. 8,500)
   upsertCustomerRow(sheet, {
     id: "u-menuka",
     name: "Menuka Wijebandara",
     email: "menuka.wijebandara@gmail.com",
     phone: "0771234567",
-    packageName: "Hourly Flex (2h @ Rs.3000)",
-    packagePrice: 11000,
+    packageName: "Hourly Flex (2h @ Rs. 3,000)",
+    packagePrice: 15500,
     paidAmount: 7000,
-    balanceDue: 4000,
-    totalHours: 8,
-    usedHours: 3,
-    remainingHours: 5,
+    balanceDue: 8500,
+    totalHours: 11.5,
+    usedHours: 6.5,
+    remainingHours: 5.0,
     status: "Active",
-    timestamp: "2026-09-21 11:30"
+    timestamp: "2026-10-05 15:52"
   });
 
   // 3. Janith Mihira (One-time recording session: Rs. 2,000 to collect)
@@ -748,4 +749,32 @@ function loadRealData() {
 
   recalculateFinancials();
   SpreadsheetApp.getActiveSpreadsheet().toast("✓ Real Customer Data Loaded: Kavindya, Menuka & Janith!", "Think Studio", 5);
+}
+
+/**
+ * Specifically update Menuka Wijebandara with Today's 3.5h Session (Rs. 4,500 Unpaid)
+ * Directly updates Row 5 in Google Sheet!
+ */
+function updateMenukaTodaySession() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME) || setupThinkStudioDashboard();
+
+  upsertCustomerRow(sheet, {
+    id: "u-menuka",
+    name: "Menuka Wijebandara",
+    email: "menuka.wijebandara@gmail.com",
+    phone: "0771234567",
+    packageName: "Hourly Flex (2h @ Rs. 3,000)",
+    packagePrice: 15500,
+    paidAmount: 7000,
+    balanceDue: 8500,
+    totalHours: 11.5,
+    usedHours: 6.5,
+    remainingHours: 5.0,
+    status: "Active",
+    timestamp: Utilities.formatDate(new Date(), "Asia/Colombo", "yyyy-MM-dd HH:mm")
+  });
+
+  recalculateFinancials();
+  SpreadsheetApp.getActiveSpreadsheet().toast("✓ Menuka Wijebandara Updated: Today 3.5h added! Balance Due: Rs. 8,500", "Think Studio", 5);
 }

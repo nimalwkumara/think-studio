@@ -748,7 +748,7 @@ function loadRealData() {
     timestamp: "2026-09-29 14:00"
   });
 
-  // 4. Menuka Wijebandara (Session 2: Today 2026-10-05 - 3.5 Hours, Fee = Rs. 4,500, Paid = Rs. 0, Balance due = Rs. 4,500)
+  // 4. Menuka Wijebandara (Session 2: 2026-10-05 - 3.5 Hours, Fee = Rs. 4,500, Paid = Rs. 0, Balance due = Rs. 4,500)
   upsertCustomerRow(sheet, {
     id: "u-menuka-oct05",
     name: "Menuka Wijebandara",
@@ -763,6 +763,23 @@ function loadRealData() {
     remainingHours: 0.0,
     status: "Active",
     timestamp: "2026-10-05 15:52"
+  });
+
+  // 5. Menuka Wijebandara (Session 3: 2026-10-11 - 1:00 PM to 5:30 PM • 4.5 Hours, Fee = Rs. 12,000, Paid = Rs. 0, Balance due = Rs. 12,000)
+  upsertCustomerRow(sheet, {
+    id: "u-menuka-oct11",
+    name: "Menuka Wijebandara",
+    email: "menuka.wijebandara@gmail.com",
+    phone: "0771234567",
+    packageName: "Studio Session (1:00PM - 5:30PM • 4.5h)",
+    packagePrice: 12000,
+    paidAmount: 0,
+    balanceDue: 12000,
+    totalHours: 4.5,
+    usedHours: 4.5,
+    remainingHours: 0.0,
+    status: "Active",
+    timestamp: "2026-10-11 13:00"
   });
 
   // Populate verified bank payments into Side Table 2

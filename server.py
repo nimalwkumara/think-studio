@@ -175,6 +175,28 @@ def init_db():
         )
     ''')
 
+    # 6. Invoices Table
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS invoices (
+            id TEXT PRIMARY KEY,
+            invoice_number TEXT NOT NULL,
+            customer_id TEXT DEFAULT '',
+            customer_name TEXT NOT NULL,
+            customer_email TEXT NOT NULL,
+            customer_phone TEXT DEFAULT '',
+            issue_date TEXT NOT NULL,
+            due_date TEXT NOT NULL,
+            items_json TEXT NOT NULL,
+            subtotal REAL NOT NULL,
+            discount REAL DEFAULT 0,
+            tax REAL DEFAULT 0,
+            total_amount REAL NOT NULL,
+            status TEXT DEFAULT 'Unpaid',
+            notes TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     # Schema migrations
     for col in [
         ('users', 'password_hash', 'TEXT DEFAULT ""'),
@@ -295,6 +317,35 @@ def init_db():
         c.execute('INSERT OR REPLACE INTO settings (key, value) VALUES ("googleClientSecret", ?)', (env_client_secret,))
     else:
         c.execute('INSERT OR IGNORE INTO settings (key, value) VALUES ("googleClientSecret", "")')
+
+    # Seed initial invoice for Menuka's today session if not exists
+    c.execute('SELECT COUNT(*) FROM invoices WHERE id = "INV-MEN-OCT11"')
+    if c.fetchone()[0] == 0:
+        c.execute('''
+            INSERT INTO invoices (id, invoice_number, customer_id, customer_name, customer_email, customer_phone, issue_date, due_date, items_json, subtotal, discount, tax, total_amount, status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            'INV-MEN-OCT11',
+            'TS-INV-2026-1011',
+            'u-menuka',
+            'Menuka (DJ Menuka)',
+            'menukadj@gmail.com',
+            '0774567890',
+            '2026-10-11',
+            '2026-10-18',
+            json.dumps([{
+                "description": "Studio Live Recording & Production Session (1:00 PM - 5:30 PM • 4.5 Hours)",
+                "quantity": 4.5,
+                "rate": 2666.67,
+                "amount": 12000.0
+            }]),
+            12000.0,
+            0.0,
+            0.0,
+            12000.0,
+            'Unpaid',
+            "Studio Session: 1.00pm to 5.30pm (4.5 Hours). Please transfer to People's Bank A/C: 245200290056879 (E.M.S.S. Fonseka)."
+        ))
 
     conn.commit()
     conn.close()
@@ -432,6 +483,7 @@ def get_public_state():
         "reviews": reviews,
         "pendingSlips": [],
         "allPayments": [],
+        "invoices": [],
         "studioBank": studio_bank,
         "googleClientId": google_client_id,
         "universalZoom": universal_zoom,
@@ -491,6 +543,17 @@ def get_customer_state(email: str):
             "status": b["status"]
         })
 
+    # Customer's invoices
+    c.execute('SELECT * FROM invoices WHERE LOWER(customer_email) = LOWER(?) ORDER BY issue_date DESC, created_at DESC', (email,))
+    cust_invoices = []
+    for inv in c.fetchall():
+        inv_d = dict(inv)
+        try:
+            inv_d['items'] = json.loads(inv_d['items_json'])
+        except Exception:
+            inv_d['items'] = []
+        cust_invoices.append(inv_d)
+
     # Public reviews & bank details
     c.execute('SELECT id, author, role, rating, comment, created_at FROM reviews WHERE status = "Approved" ORDER BY created_at DESC')
     reviews = [dict(r) for r in c.fetchall()]
@@ -511,6 +574,7 @@ def get_customer_state(email: str):
         "reviews": reviews,
         "pendingSlips": [],
         "allPayments": [],
+        "invoices": cust_invoices,
         "studioBank": studio_bank,
         "googleClientId": google_client_id,
         "databaseType": "SQLite3 (Customer Isolated)"
@@ -608,6 +672,17 @@ def get_full_state():
             "slipFilename": p_dict.get("slip_filename") or ""
         })
 
+    # All Invoices (for admin invoice management & generator)
+    c.execute('SELECT * FROM invoices ORDER BY issue_date DESC, created_at DESC')
+    all_invoices = []
+    for inv in c.fetchall():
+        inv_d = dict(inv)
+        try:
+            inv_d['items'] = json.loads(inv_d['items_json'])
+        except Exception:
+            inv_d['items'] = []
+        all_invoices.append(inv_d)
+
     # Bank Settings
     c.execute('SELECT value FROM settings WHERE key = "studioBank"')
     sb_row = c.fetchone()
@@ -635,6 +710,7 @@ def get_full_state():
         "reviews": reviews,
         "pendingSlips": pending_slips,
         "allPayments": all_payments,
+        "invoices": all_invoices,
         "studioBank": studio_bank,
         "googleSheetWebhook": google_sheet_webhook,
         "googleClientId": google_client_id,
@@ -765,6 +841,32 @@ class ThinkStudioHandler(http.server.SimpleHTTPRequestHandler):
                 "passcode": uz_data.get("passcode"),
                 "isVerified": True
             })
+            return
+
+        # 7. Invoices endpoint
+        elif parsed.path == '/api/invoices':
+            session = get_session_from_headers(self.headers)
+            conn = get_db()
+            c = conn.cursor()
+            if session and session.get("role") == "admin":
+                c.execute('SELECT * FROM invoices ORDER BY issue_date DESC, created_at DESC')
+            elif session and session.get("role") == "customer":
+                c.execute('SELECT * FROM invoices WHERE LOWER(customer_email) = LOWER(?) ORDER BY issue_date DESC, created_at DESC', (session.get("email"),))
+            else:
+                conn.close()
+                self.send_json({"error": "Unauthorized: Access restricted to authorized users."}, 401)
+                return
+
+            invoices = []
+            for inv in c.fetchall():
+                inv_d = dict(inv)
+                try:
+                    inv_d['items'] = json.loads(inv_d['items_json'])
+                except Exception:
+                    inv_d['items'] = []
+                invoices.append(inv_d)
+            conn.close()
+            self.send_json({"success": True, "invoices": invoices})
             return
 
         # Serve static HTML/assets
@@ -1579,6 +1681,86 @@ class ThinkStudioHandler(http.server.SimpleHTTPRequestHandler):
                 sync_user_to_google_sheet(dict(u_row))
             conn.close()
             self.send_json({"success": True, "message": "Profile updated in SQLite DB and synced to Google Sheet."})
+            return
+
+        # 18. Invoices: Create or Update Invoice (Admin Only)
+        elif parsed.path == '/api/invoices':
+            if not is_admin_request(self.headers, payload):
+                conn.close()
+                self.send_json({"success": False, "error": "Unauthorized: Administrator credentials required."}, 403)
+                return
+
+            inv_id = payload.get('id') or f"INV-{int(time.time() * 1000)}"
+            invoice_number = payload.get('invoiceNumber') or f"TS-INV-{time.strftime('%Y')}-{int(time.time() % 10000):04d}"
+            customer_id = payload.get('customerId', '')
+            customer_name = payload.get('customerName', '').strip()
+            customer_email = payload.get('customerEmail', '').strip().lower()
+            customer_phone = payload.get('customerPhone', '').strip()
+            issue_date = payload.get('issueDate') or time.strftime("%Y-%m-%d")
+            due_date = payload.get('dueDate') or time.strftime("%Y-%m-%d", time.localtime(time.time() + 7*86400))
+            items = payload.get('items', [])
+            items_json = json.dumps(items)
+            subtotal = float(payload.get('subtotal', 0))
+            discount = float(payload.get('discount', 0))
+            tax = float(payload.get('tax', 0))
+            total_amount = float(payload.get('totalAmount', max(0, subtotal - discount + tax)))
+            status = payload.get('status', 'Unpaid')
+            notes = payload.get('notes', '')
+
+            if not customer_name or total_amount <= 0:
+                conn.close()
+                self.send_json({"success": False, "error": "Customer name and positive total amount are required."}, 400)
+                return
+
+            c.execute('''
+                INSERT OR REPLACE INTO invoices (id, invoice_number, customer_id, customer_name, customer_email, customer_phone, issue_date, due_date, items_json, subtotal, discount, tax, total_amount, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (inv_id, invoice_number, customer_id, customer_name, customer_email, customer_phone, issue_date, due_date, items_json, subtotal, discount, tax, total_amount, status, notes))
+            conn.commit()
+            conn.close()
+
+            self.send_json({
+                "success": True,
+                "invoiceId": inv_id,
+                "invoiceNumber": invoice_number,
+                "message": f"Invoice {invoice_number} saved successfully ({status})."
+            })
+            return
+
+        # 19. Invoices: Toggle Status (Admin Only)
+        elif parsed.path == '/api/invoices/toggle-status':
+            if not is_admin_request(self.headers, payload):
+                conn.close()
+                self.send_json({"success": False, "error": "Unauthorized: Administrator credentials required."}, 403)
+                return
+
+            inv_id = payload.get('invoiceId')
+            new_status = payload.get('newStatus', 'Paid')
+            c.execute('SELECT * FROM invoices WHERE id = ?', (inv_id,))
+            inv = c.fetchone()
+            if not inv:
+                conn.close()
+                self.send_json({"success": False, "error": "Invoice not found."}, 404)
+                return
+
+            c.execute('UPDATE invoices SET status = ? WHERE id = ?', (new_status, inv_id))
+            conn.commit()
+            conn.close()
+            self.send_json({"success": True, "invoiceId": inv_id, "status": new_status, "message": f"Invoice status changed to {new_status}."})
+            return
+
+        # 20. Invoices: Delete Invoice (Admin Only)
+        elif parsed.path == '/api/invoices/delete':
+            if not is_admin_request(self.headers, payload):
+                conn.close()
+                self.send_json({"success": False, "error": "Unauthorized: Administrator credentials required."}, 403)
+                return
+
+            inv_id = payload.get('invoiceId')
+            c.execute('DELETE FROM invoices WHERE id = ?', (inv_id,))
+            conn.commit()
+            conn.close()
+            self.send_json({"success": True, "invoiceId": inv_id, "message": "Invoice deleted successfully."})
             return
 
         conn.close()
